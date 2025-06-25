@@ -1,4 +1,4 @@
-import { ActionNode, TriggerType } from "../entities/workflow";
+import type { ActionNode, TriggerType } from "../entities/workflow";
 
 export interface CreateWorkflowUseCase {
   execute(

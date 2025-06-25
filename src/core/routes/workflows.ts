@@ -7,6 +7,7 @@ import type { Controller } from "../../presentation/protocols/controller";
 export class WorkflowsRoutes {
   constructor(
     private readonly createWorkflowController: Controller,
+    private readonly listWorkflowsController: Controller,
     private readonly tokenProvider: TokenProvider
   ) {}
 
@@ -17,6 +18,12 @@ export class WorkflowsRoutes {
       "/workflows",
       authMiddleware,
       adaptRoute(this.createWorkflowController)
+    );
+
+    router.get(
+      "/workflows",
+      authMiddleware,
+      adaptRoute(this.listWorkflowsController)
     );
   }
 }

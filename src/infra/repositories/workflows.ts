@@ -5,7 +5,7 @@ import type { Database } from "../database/database";
 export class WorkflowsRepository implements WorkflowsRepositoryInterface {
   constructor(private readonly db: Database) {}
 
-  async getWorkflows(userId: string): Promise<Workflow[]> {
+  async listWorkflows(userId: string): Promise<Workflow[]> {
     const workflows = await this.db.query<Workflow[]>(
       "SELECT * FROM workflows WHERE created_by = $1",
       [userId]

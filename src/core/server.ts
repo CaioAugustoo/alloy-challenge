@@ -14,6 +14,8 @@ import { WorkflowsRepository } from "../infra/repositories/workflows";
 import { CreateWorkflowUseCase } from "../application/use-cases/create-workflow";
 import { CreateWorkflowController } from "../presentation/controllers/create-workflow";
 import { WorkflowsRoutes } from "./routes/workflows";
+import { ListWorkflowsUseCase } from "../application/use-cases/list-workflows";
+import { ListWorkflowsController } from "../presentation/controllers/list-workflows";
 
 const app = express();
 app.use(bodyParser);
@@ -41,15 +43,24 @@ const initApp = async () => {
     workflowsRepository,
     usersRepository
   );
+  const listWorkflowsUseCase = new ListWorkflowsUseCase(
+    workflowsRepository,
+    usersRepository
+  );
 
   const signUpController = new SignUpController(createUserUseCase);
+
   const createWorkflowController = new CreateWorkflowController(
     createWorkflowUseCase
+  );
+  const listWorkflowsController = new ListWorkflowsController(
+    listWorkflowsUseCase
   );
 
   const authRoutes = new AuthRoutes(signUpController);
   const workflowsRoutes = new WorkflowsRoutes(
     createWorkflowController,
+    listWorkflowsController,
     tokenProvider
   );
 
