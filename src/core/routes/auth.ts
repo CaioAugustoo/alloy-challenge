@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { SignUpController } from "../../presentation/controllers/signup";
 import { adaptRoute } from "../adapters/express-route";
+import { Controller } from "../../presentation/protocols/controller";
 
 export class AuthRoutes {
-  constructor(private readonly controller: SignUpController) {}
+  constructor(private readonly signUpController: Controller) {}
 
   register(router: Router): void {
-    router.post("/signup", adaptRoute(this.controller));
+    router.post("/signup", adaptRoute(this.signUpController));
   }
 }
