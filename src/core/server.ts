@@ -10,6 +10,10 @@ import { bodyParser } from "./middlewares/body-parser";
 import { cors } from "./middlewares/cors";
 import { contentType } from "./middlewares/content-type";
 import { JWTProvider } from "../shared/auth/jwt";
+import { WorkflowsRepository } from "../infra/repositories/workflows";
+import { CreateWorkflowUseCase } from "../application/use-cases/create-workflow";
+import { CreateWorkflowController } from "../presentation/controllers/create-workflow";
+import { WorkflowsRoutes } from "./routes/workflows";
 
 const app = express();
 app.use(bodyParser);
@@ -25,6 +29,7 @@ const initApp = async () => {
   await db.connect();
 
   const usersRepository = new UsersRepository(db);
+  const workflowsRepository = new WorkflowsRepository(db);
 
   const createUserUseCase = new CreateUserUseCase(
     usersRepository,
@@ -32,11 +37,24 @@ const initApp = async () => {
     tokenProvider
   );
 
+  const createWorkflowUseCase = new CreateWorkflowUseCase(
+    workflowsRepository,
+    usersRepository
+  );
+
   const signUpController = new SignUpController(createUserUseCase);
+  const createWorkflowController = new CreateWorkflowController(
+    createWorkflowUseCase
+  );
 
   const authRoutes = new AuthRoutes(signUpController);
+  const workflowsRoutes = new WorkflowsRoutes(
+    createWorkflowController,
+    tokenProvider
+  );
 
   authRoutes.register(app);
+  workflowsRoutes.register(app);
 
   app.listen(env.port, () =>
     console.log(`App running at http://localhost:${env.port}`)
