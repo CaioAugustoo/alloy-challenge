@@ -8,15 +8,19 @@ export class Postgres implements Database {
     this.client = new Client({ connectionString });
   }
 
-  async query<T>(query: string): Promise<T> {
+  async query<T>(query: string, params?: any[]): Promise<T> {
     const client = await this.getClient();
-    const result = await client.query(query);
+    const result = await client.query(query, params);
     return result.rows[0];
   }
 
   async connect(): Promise<this> {
     await this.client.connect();
     return this;
+  }
+
+  async close(): Promise<void> {
+    await this.client.end();
   }
 
   private async getClient(): Promise<Client> {
