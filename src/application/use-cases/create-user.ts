@@ -1,8 +1,8 @@
-import { UsersRepository } from "../../domain/repositories/users";
 import { EmailInUseError } from "../../domain/errors/email-in-use";
 import { User } from "../../domain/entities/user";
 import type { TokenProvider } from "../../shared/auth/token-provider";
 import type { Hasher } from "../../shared/hashing/hashing";
+import type { UsersRepository } from "../../domain/repositories/users";
 import type { CreateUserUseCase as CreateUserUseCaseInterface } from "../../domain/use-cases/create-user";
 
 const oneHourInSeconds = 60 * 60;
