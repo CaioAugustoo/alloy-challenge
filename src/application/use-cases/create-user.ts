@@ -5,7 +5,7 @@ import type { Hasher } from "../../shared/hashing/hashing";
 import type { UsersRepository } from "../../domain/repositories/users";
 import type { CreateUserUseCase as CreateUserUseCaseInterface } from "../../domain/use-cases/create-user";
 
-const oneHourInSeconds = 60 * 60;
+const oneHourInSeconds = 1 * 3600;
 
 export class CreateUserUseCase implements CreateUserUseCaseInterface {
   constructor(
