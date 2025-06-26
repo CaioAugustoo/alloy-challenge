@@ -175,13 +175,6 @@ The algorithm will retry the failed action with exponential backoff until the `m
 
 ## Running the Application
 
-### Locally
-
-```bash
-npm run build
-npm start
-```
-
 ### With Docker Compose
 
 ```bash
