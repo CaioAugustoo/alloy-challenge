@@ -34,7 +34,7 @@ This project implements a basic workflow automation system where users can:
 - Support a limited set of triggers (e.g., time-based schedules, webhook events)
 - Support a limited set of actions (e.g., sending HTTP requests, logging messages)
 
-The API exposes endpoints to create, list, update, and execute workflows programmatically.
+The API exposes endpoints to create, list and execute workflows programmatically.
 
 ---
 
