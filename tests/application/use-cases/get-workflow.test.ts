@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, test } from "vitest";
+import { describe, expect, vi, beforeEach, test } from "vitest";
 import { GetWorkflowUseCase } from "../../../src/application/use-cases/get-workflow";
 import { UserNotFoundError } from "../../../src/domain/errors/user-not-found";
 import { WorkflowNotFoundError } from "../../../src/domain/errors/workflow-not-found";

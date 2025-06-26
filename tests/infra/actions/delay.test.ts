@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach, test } from "vitest";
+import { describe, expect, vi, beforeEach, afterEach, test } from "vitest";
 import { DelayActionHandler } from "../../../src/infra/actions/delay";
 import { ActionNode, NodeType } from "../../../src/domain/entities/workflow";
 
