@@ -3,8 +3,6 @@ import type { Router, Request, Response, NextFunction } from "express";
 import type { TokenProvider } from "../../../src/shared/auth/token-provider";
 import { Controller } from "../../../src/presentation/protocols/controller";
 import { WorkflowsRoutes } from "../../../src/core/routes/workflows";
-import { auth } from "../../../src/core/middlewares/auth";
-import { adaptRoute } from "../../../src/core/adapters/express-route";
 
 vi.mock(
   "../../../src/modules/workflow/presentation/adapters/express-route",
