@@ -56,7 +56,7 @@ export class Workflow {
     updatedAt: Date;
   } {
     const actionsNodes: Record<string, ActionNode> = {};
-    const nodes = this.actions.size > 0 ? this.actions.entries() : [];
+    const nodes = this.actions.entries();
 
     for (const [id, node] of nodes) {
       actionsNodes[id] = node;
