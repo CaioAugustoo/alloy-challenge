@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vitest-coverage
-          path: coverage
+          path: vitest-coverage
