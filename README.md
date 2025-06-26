@@ -1,3 +1,5 @@
+![ci status](https://github.com/CaioAugustoo/alloy-challenge/.github/workflows/ci.yml/badge.svg)
+
 **Workflow Automation API**
 
 A Node.js API for building and executing basic workflow automations, allowing users to define workflows composed of triggers and actions. This project follows Clean Architecture and Domain-Driven Design (DDD) principles for maintainability and scalability.
