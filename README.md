@@ -181,6 +181,10 @@ The algorithm will retry the failed action with exponential backoff until the `m
 docker-compose up --build -d
 ```
 
+**If you face some cache issues with Docker, try to export this env var:**
+
+`export DOCKER_DEFAULT_PLATFORM= && docker-compose up --build -d`
+
 The API will be available at `http://localhost:3000`. Also a postgres database will be available at `localhost:5432`.
 
 ---
