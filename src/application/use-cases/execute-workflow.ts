@@ -58,16 +58,21 @@ export class ExecuteWorkflowUseCase implements ExecuteWorkflowUseCaseInterface {
 
       console.log(`Executing action "${node.type}"`);
 
+      let attempt = state.retries[currentId] ?? 0;
+
       const success = await this.executeWithRetry(
         handler,
         node,
         currentId,
         state,
         maxRetries,
-        backoffBaseMs
+        backoffBaseMs,
+        attempt
       );
 
       if (!success) {
+        await this.saveState(state);
+        console.log(`Action "${node.type}" failed`);
         throw new FailedExecuteWorkflowError(currentId);
       }
 
@@ -107,17 +112,17 @@ export class ExecuteWorkflowUseCase implements ExecuteWorkflowUseCaseInterface {
     currentId: string,
     state: ExecutionState,
     maxRetries: number,
-    backoffBaseMs: number
+    backoffBaseMs: number,
+    attempt = 0
   ): Promise<boolean> {
-    let attempt = state.retries[currentId] ?? 0;
-
     while (attempt <= maxRetries) {
       try {
         await handler.handle(node);
-        state.retries[currentId] = attempt;
         return true;
       } catch {
         attempt++;
+        state.retries[currentId] = attempt;
+
         if (attempt > maxRetries) return false;
 
         const delay = backoffBaseMs * Math.pow(2, attempt - 1);
