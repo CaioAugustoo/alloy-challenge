@@ -3,7 +3,6 @@ export class Email {
 
   constructor(value: string) {
     this.value = value;
-    this.ensureIsValid();
   }
 
   static create(value: string): Email {
@@ -12,13 +11,6 @@ export class Email {
 
   getValue(): string {
     return this.value;
-  }
-
-  private ensureIsValid(): void {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.value)) {
-      throw new Error(`Invalid email format: ${this.value}`);
-    }
   }
 
   equals(other: Email): boolean {

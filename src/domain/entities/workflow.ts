@@ -1,11 +1,17 @@
 import { v4 as uuid } from "uuid";
 
+export enum NodeType {
+  DELAY = "delay",
+  HTTP = "http",
+  LOG = "log",
+}
+
 export type TriggerType = "time" | "webhook";
 export type ActionNode = {
-  id: string;
-  type: string;
+  action_id: string;
+  type: NodeType;
   params: Record<string, any>;
-  next?: string[];
+  next_ids?: string[];
 };
 
 export class Workflow {
@@ -15,7 +21,7 @@ export class Workflow {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
     public readonly createdBy: string,
-    private readonly nodes: Map<string, ActionNode>
+    private readonly actions: Map<string, ActionNode>
   ) {}
 
   static createNew(createdBy: string, triggerType: TriggerType): Workflow {
@@ -30,14 +36,14 @@ export class Workflow {
   }
 
   static createFromPersistence(record: any): Workflow {
-    const map = new Map<string, ActionNode>(Object.entries(record.actions));
+    const actions = new Map<string, ActionNode>(Object.entries(record.actions));
     return new Workflow(
       record.id,
-      record.triggerType,
-      record.createdAt,
-      record.updatedAt,
-      record.createdBy,
-      map
+      record.trigger_type,
+      record.created_at,
+      record.updated_at,
+      record.created_by,
+      actions
     );
   }
 
@@ -49,63 +55,53 @@ export class Workflow {
     createdAt: Date;
     updatedAt: Date;
   } {
-    const actions: Record<string, ActionNode> = {};
-    for (const [id, node] of this.nodes.entries()) {
-      actions[id] = node;
+    const actionsNodes: Record<string, ActionNode> = {};
+    const nodes = this.actions.size > 0 ? this.actions.entries() : [];
+
+    for (const [id, node] of nodes) {
+      actionsNodes[id] = node;
     }
+
     return {
       id: this.id,
       triggerType: this.triggerType,
-      actions,
+      actions: actionsNodes,
       createdBy: this.createdBy,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
   }
 
+  getActions(): Record<string, ActionNode> {
+    const actions: Record<string, ActionNode> = {};
+    this.actions.forEach((value) => {
+      actions[value.action_id] = value;
+    });
+    return actions;
+  }
+
   addAction(node: ActionNode): void {
-    if (this.nodes.has(node.id)) {
-      throw new Error(`Action with id "${node.id}" already exists`);
+    if (this.actions.has(node.action_id)) {
+      throw new Error(`Action with id "${node.action_id}" already exists`);
     }
-    this.nodes.set(node.id, node);
-    this.ensureAcyclic();
+    this.actions.set(node.action_id, node);
   }
 
   getAction(id: string): ActionNode {
-    const node = this.nodes.get(id);
+    let node = undefined;
+
+    this.actions.forEach((value) => {
+      if (value.action_id === id) {
+        node = value;
+      }
+    });
+
     if (!node) throw new Error(`Action node "${id}" not found`);
     return node;
   }
 
   get entryActionId(): string {
-    const ids = Array.from(this.nodes.keys());
-    if (ids.length === 0) throw new Error("Workflow has no actions");
+    const ids = Array.from(this.actions.keys());
     return ids[0];
-  }
-
-  private ensureAcyclic(): void {
-    const visited = new Set<string>();
-    const inStack = new Set<string>();
-
-    const dfs = (id: string) => {
-      if (inStack.has(id)) {
-        throw new Error(`Cycle detected at action "${id}"`);
-      }
-      if (visited.has(id)) return;
-      visited.add(id);
-      inStack.add(id);
-
-      const node = this.nodes.get(id);
-      if (node?.next) {
-        for (const nextId of node.next) {
-          dfs(nextId);
-        }
-      }
-      inStack.delete(id);
-    };
-
-    for (const start of this.nodes.keys()) {
-      dfs(start);
-    }
   }
 }

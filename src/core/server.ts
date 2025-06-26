@@ -1,11 +1,11 @@
-import { Postgres } from "../infra/database/adapters/postgres";
 import express from "express";
+import env from "./env";
+import { Postgres } from "../infra/database/adapters/postgres";
 import { AuthRoutes } from "./routes/auth";
 import { SignUpController } from "../presentation/controllers/signup";
 import { CreateUserUseCase } from "../application/use-cases/create-user";
 import { BcryptHasher } from "../shared/hashing/bcrypt";
 import { UsersRepository } from "../infra/repositories/users";
-import env from "./env";
 import { bodyParser } from "./middlewares/body-parser";
 import { cors } from "./middlewares/cors";
 import { contentType } from "./middlewares/content-type";
@@ -16,6 +16,20 @@ import { CreateWorkflowController } from "../presentation/controllers/create-wor
 import { WorkflowsRoutes } from "./routes/workflows";
 import { ListWorkflowsUseCase } from "../application/use-cases/list-workflows";
 import { ListWorkflowsController } from "../presentation/controllers/list-workflows";
+import { ExecuteWorkflowController } from "../presentation/controllers/execute-workflow";
+import {
+  ActionHandler,
+  ExecuteWorkflowUseCase,
+} from "../application/use-cases/execute-workflow";
+import { WorkflowExecutionsRepository } from "../infra/repositories/executions";
+import { HttpActionHandler } from "../infra/actions/http";
+import { LogActionHandler } from "../infra/actions/log";
+import { DelayActionHandler } from "../infra/actions/delay";
+import { NodeType } from "../domain/entities/workflow";
+import { DeleteWorkflowUseCase } from "../application/use-cases/delete-workflow";
+import { DeleteWorkflowController } from "../presentation/controllers/delete-workflow";
+import { GetWorkflowUseCase } from "../application/use-cases/get-workflow";
+import { GetWorkflowController } from "../presentation/controllers/get-workflow";
 
 const app = express();
 app.use(bodyParser);
@@ -24,14 +38,20 @@ app.use(contentType);
 
 const hasher = new BcryptHasher(Number(env.hashSalts));
 const tokenProvider = new JWTProvider(env.jwtSecret);
-
 const db = new Postgres(env.databaseUrl);
+
+const handlers: Record<NodeType, ActionHandler> = {
+  http: new HttpActionHandler(),
+  log: new LogActionHandler(),
+  delay: new DelayActionHandler(),
+};
 
 const initApp = async () => {
   await db.connect();
 
   const usersRepository = new UsersRepository(db);
   const workflowsRepository = new WorkflowsRepository(db);
+  const executionsRepository = new WorkflowExecutionsRepository(db);
 
   const createUserUseCase = new CreateUserUseCase(
     usersRepository,
@@ -39,6 +59,10 @@ const initApp = async () => {
     tokenProvider
   );
 
+  const getWorkflowUseCase = new GetWorkflowUseCase(
+    workflowsRepository,
+    usersRepository
+  );
   const createWorkflowUseCase = new CreateWorkflowUseCase(
     workflowsRepository,
     usersRepository
@@ -47,20 +71,39 @@ const initApp = async () => {
     workflowsRepository,
     usersRepository
   );
+  const executeWorkflowUseCase = new ExecuteWorkflowUseCase(
+    workflowsRepository,
+    executionsRepository,
+    handlers
+  );
+  const deleteWorkflowUseCase = new DeleteWorkflowUseCase(
+    workflowsRepository,
+    usersRepository
+  );
 
   const signUpController = new SignUpController(createUserUseCase);
 
+  const getWorkflowController = new GetWorkflowController(getWorkflowUseCase);
   const createWorkflowController = new CreateWorkflowController(
     createWorkflowUseCase
   );
   const listWorkflowsController = new ListWorkflowsController(
     listWorkflowsUseCase
   );
+  const executeWorkflowController = new ExecuteWorkflowController(
+    executeWorkflowUseCase
+  );
+  const deleteWorkflowController = new DeleteWorkflowController(
+    deleteWorkflowUseCase
+  );
 
   const authRoutes = new AuthRoutes(signUpController);
   const workflowsRoutes = new WorkflowsRoutes(
     createWorkflowController,
     listWorkflowsController,
+    executeWorkflowController,
+    deleteWorkflowController,
+    getWorkflowController,
     tokenProvider
   );
 

@@ -5,7 +5,7 @@ import type { Hasher } from "../../shared/hashing/hashing";
 import type { UsersRepository } from "../../domain/repositories/users";
 import type { CreateUserUseCase as CreateUserUseCaseInterface } from "../../domain/use-cases/create-user";
 
-const oneHourInSeconds = 1 * 3600;
+const oneDayInSeconds = 1 * 24 * 3600;
 
 export class CreateUserUseCase implements CreateUserUseCaseInterface {
   constructor(
@@ -20,7 +20,7 @@ export class CreateUserUseCase implements CreateUserUseCaseInterface {
     const { name, email, password } = params;
 
     const foundUser = await this.usersRepository.findByEmail(email);
-    if (foundUser) {
+    if (!!foundUser) {
       throw new EmailInUseError();
     }
 
@@ -32,7 +32,7 @@ export class CreateUserUseCase implements CreateUserUseCaseInterface {
       email: email,
     };
 
-    const accessToken = this.tokenProvider.sign(tokenPayload, oneHourInSeconds);
+    const accessToken = this.tokenProvider.sign(tokenPayload, oneDayInSeconds);
 
     return {
       accessToken,

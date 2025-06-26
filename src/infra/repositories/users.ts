@@ -11,7 +11,9 @@ export class UsersRepository implements UsersRepositoryInterface {
       [id]
     );
 
-    if (!foundUser) return;
+    if (!foundUser) {
+      return;
+    }
 
     const user = User.createFromPersistence(foundUser);
     return user;
@@ -23,7 +25,9 @@ export class UsersRepository implements UsersRepositoryInterface {
       [email]
     );
 
-    if (!foundUser) return;
+    if (!foundUser) {
+      return;
+    }
 
     const user = User.createFromPersistence(foundUser);
     return user;
