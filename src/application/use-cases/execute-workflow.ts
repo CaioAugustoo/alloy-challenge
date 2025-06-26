@@ -115,13 +115,15 @@ export class ExecuteWorkflowUseCase implements ExecuteWorkflowUseCaseInterface {
     backoffBaseMs: number,
     attempt = 0
   ): Promise<boolean> {
+    attempt = 0;
+
     while (attempt <= maxRetries) {
       try {
         await handler.handle(node);
         return true;
       } catch {
-        attempt++;
         state.retries[currentId] = attempt;
+        attempt++;
 
         if (attempt > maxRetries) return false;
 
