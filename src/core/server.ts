@@ -120,5 +120,6 @@ const initApp = async () => {
 
 initApp().catch((err) => {
   db.close();
+  console.log(err);
   process.exit(1);
 });

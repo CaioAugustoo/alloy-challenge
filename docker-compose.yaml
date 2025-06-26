@@ -1,8 +1,32 @@
 services:
-  postgres:
-    image: postgres
+  alloy-api:
+    build:
+      context: .
     environment:
-      POSTGRES_PASSWORD: "alloy"
-      POSTGRES_USER: "alloy"
+      NODE_ENV: production
+      DATABASE_URL: postgresql://alloy:alloy@alloy-database:5432/alloy
+    ports:
+      - 3000:3000
+
+    depends_on:
+      alloy-database:
+        condition: service_healthy
+  alloy-database:
+    image: postgres
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/
+      - ./migrations:/docker-entrypoint-initdb.d:rw
+    environment:
+      - POSTGRES_DB=alloy
+      - POSTGRES_USER=alloy
+      - POSTGRES_PASSWORD=alloy
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+volumes:
+  db-data:

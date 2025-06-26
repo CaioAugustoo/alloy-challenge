@@ -1,4 +1,4 @@
-namespace Express {
+declare namespace Express {
   interface Request {
     accountId: string;
   }
