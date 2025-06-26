@@ -30,6 +30,7 @@ import { DeleteWorkflowUseCase } from "../application/use-cases/delete-workflow"
 import { DeleteWorkflowController } from "../presentation/controllers/delete-workflow";
 import { GetWorkflowUseCase } from "../application/use-cases/get-workflow";
 import { GetWorkflowController } from "../presentation/controllers/get-workflow";
+import { LogsRepository } from "../infra/repositories/logs";
 
 const app = express();
 app.use(bodyParser);
@@ -52,6 +53,7 @@ const initApp = async () => {
   const usersRepository = new UsersRepository(db);
   const workflowsRepository = new WorkflowsRepository(db);
   const executionsRepository = new WorkflowExecutionsRepository(db);
+  const logsRepository = new LogsRepository(db);
 
   const createUserUseCase = new CreateUserUseCase(
     usersRepository,
@@ -74,6 +76,7 @@ const initApp = async () => {
   const executeWorkflowUseCase = new ExecuteWorkflowUseCase(
     workflowsRepository,
     executionsRepository,
+    logsRepository,
     handlers
   );
   const deleteWorkflowUseCase = new DeleteWorkflowUseCase(

@@ -1,106 +1,117 @@
 import { describe, expect, vi, beforeEach, test } from "vitest";
 import { WorkflowExecutionsRepository } from "../../../src/infra/repositories/executions";
+import { ExecutionState } from "../../../src/domain/repositories/executions";
 
 describe("WorkflowExecutionsRepository", () => {
-  let dbMock: { query: any };
+  let db: { query: ReturnType<typeof vi.fn> };
   let repo: WorkflowExecutionsRepository;
 
   beforeEach(() => {
-    dbMock = {
-      query: vi.fn(),
-    };
-    repo = new WorkflowExecutionsRepository(dbMock as any);
+    db = { query: vi.fn() };
+    repo = new WorkflowExecutionsRepository(db as any);
   });
 
-  test("should create a new execution state", async () => {
-    const state = {
-      workflowId: "wf1",
-      executionId: "exec1",
-      currentActionId: "action1",
-      completed: false,
-      retries: { action1: 0 },
-      startedAt: new Date(),
-      updatedAt: new Date(),
-    };
+  describe("create", () => {
+    test("inserts a new execution with all fields", async () => {
+      const now = new Date();
+      const state: ExecutionState = {
+        workflowId: "wf-1",
+        executionId: "ex-1",
+        currentActionId: undefined,
+        completed: false,
+        retries: { a1: 2 },
+        startedAt: now,
+        updatedAt: now,
+      };
 
-    await repo.create(state);
+      await repo.create(state);
 
-    expect(dbMock.query).toHaveBeenCalledWith(
-      expect.stringContaining("INSERT INTO workflow_executions"),
-      [
-        state.workflowId,
-        state.executionId,
-        state.currentActionId,
-        state.completed,
-        state.retries,
-        state.startedAt,
-        state.updatedAt,
-      ]
-    );
-  });
-
-  test("should find an existing execution state", async () => {
-    const dbResult = {
-      workflow_id: "wf1",
-      execution_id: "exec1",
-      current_node: "action1",
-      completed: false,
-      retries: { action1: 0 },
-      started_at: "2023-01-01T00:00:00.000Z",
-      updated_at: "2023-01-01T00:00:00.000Z",
-    };
-
-    dbMock.query.mockResolvedValueOnce(dbResult);
-
-    const result = await repo.find("wf1", "exec1");
-
-    expect(dbMock.query).toHaveBeenCalledWith(
-      expect.stringContaining("SELECT workflow_id"),
-      ["wf1", "exec1"]
-    );
-
-    expect(result).toEqual({
-      workflowId: "wf1",
-      executionId: "exec1",
-      currentActionId: "action1",
-      completed: false,
-      retries: { action1: 0 },
-      startedAt: new Date(dbResult.started_at),
-      updatedAt: new Date(dbResult.updated_at),
+      expect(db.query).toHaveBeenCalledWith(
+        expect.stringContaining("INSERT INTO workflow_executions"),
+        ["wf-1", "ex-1", "", false, { a1: 2 }, now, now]
+      );
     });
   });
 
-  test("should return null if execution state not found", async () => {
-    dbMock.query.mockResolvedValueOnce(null);
+  describe("find", () => {
+    test("returns null when no execution found", async () => {
+      db.query.mockResolvedValueOnce(undefined);
+      const result = await repo.find("wf-1", "ex-1");
+      expect(result).toBeNull();
+    });
 
-    const result = await repo.find("wf1", "exec1");
+    test("maps row to ExecutionState correctly", async () => {
+      const now = new Date().toISOString();
+      const row = {
+        workflow_id: "wf-1",
+        execution_id: "ex-1",
+        current_node: "a1",
+        completed: true,
+        retries: { a1: 3 },
+        started_at: now,
+        updated_at: now,
+      };
+      db.query.mockResolvedValueOnce(row);
 
-    expect(result).toBeNull();
+      const result = await repo.find("wf-1", "ex-1");
+      expect(result).toBeDefined();
+      expect(result?.workflowId).toBe("wf-1");
+      expect(result?.executionId).toBe("ex-1");
+      expect(result?.currentActionId).toBe("a1");
+      expect(result?.completed).toBe(true);
+      expect(result?.retries).toEqual({ a1: 3 });
+      expect(result?.startedAt).toEqual(new Date(now));
+      expect(result?.updatedAt).toEqual(new Date(now));
+    });
+
+    test("maps null current_node to undefined", async () => {
+      const now = new Date().toISOString();
+      const row = {
+        workflow_id: "wf-2",
+        execution_id: "ex-2",
+        current_node: null,
+        completed: false,
+        retries: {},
+        started_at: now,
+        updated_at: now,
+      };
+      db.query.mockResolvedValueOnce(row);
+
+      const result = await repo.find("wf-2", "ex-2");
+      expect(result?.currentActionId).toBeUndefined();
+    });
+
+    test("calls db.query with correct SQL and parameters", async () => {
+      db.query.mockResolvedValueOnce(null);
+      await repo.find("wf-42", "exec-42");
+      expect(db.query).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "SELECT workflow_id, execution_id, current_node"
+        ),
+        ["wf-42", "exec-42"]
+      );
+    });
   });
 
-  test("should update an existing execution state", async () => {
-    const state = {
-      workflowId: "wf1",
-      executionId: "exec1",
-      currentActionId: "action2",
-      completed: true,
-      retries: { action1: 1, action2: 0 },
-      startedAt: new Date(),
-      updatedAt: new Date(),
-    };
+  describe("update", () => {
+    test("updates execution state with all fields", async () => {
+      const now = new Date();
+      const state: ExecutionState = {
+        workflowId: "wf-1",
+        executionId: "ex-1",
+        currentActionId: undefined,
+        completed: true,
+        retries: { a1: 4 },
+        startedAt: now,
+        updatedAt: now,
+      };
 
-    await repo.update(state);
+      await repo.update(state);
 
-    expect(dbMock.query).toHaveBeenCalledWith(
-      expect.stringContaining("UPDATE workflow_executions"),
-      [
-        state.workflowId,
-        state.currentActionId,
-        state.completed,
-        state.retries,
-        state.updatedAt,
-        state.executionId,
-      ]
-    );
+      expect(db.query).toHaveBeenCalledWith(
+        expect.stringContaining("UPDATE workflow_executions"),
+        ["wf-1", null, true, { a1: 4 }, now, "ex-1"]
+      );
+    });
   });
 });

@@ -3,6 +3,8 @@ import { WorkflowNotFoundError } from "../../domain/errors/workflow-not-found";
 import { NoWorkflowHandlerError } from "../../domain/errors/no-workflow-handler";
 import { sleep } from "../../shared/timing/sleep";
 import { v4 as uuid } from "uuid";
+import { WorkflowExecutionLog } from "../../domain/entities/log";
+import { WorkflowHasNoActionsError } from "../../domain/errors/workflow-has-no-actions";
 import { type ActionNode } from "../../domain/entities/workflow";
 import type { WorkflowsRepository } from "../../domain/repositories/workflows";
 import type { ExecuteWorkflowUseCase as ExecuteWorkflowUseCaseInterface } from "../../domain/use-cases/execute-workflow";
@@ -10,7 +12,7 @@ import type {
   ExecutionsRepository,
   ExecutionState,
 } from "../../domain/repositories/executions";
-import { WorkflowHasNoActionsError } from "../../domain/errors/workflow-has-no-actions";
+import type { LogsRepository } from "../../domain/repositories/logs";
 
 export interface ActionHandler {
   handle(node: ActionNode): Promise<any>;
@@ -20,6 +22,7 @@ export class ExecuteWorkflowUseCase implements ExecuteWorkflowUseCaseInterface {
   constructor(
     private readonly workflowsRepository: WorkflowsRepository,
     private readonly executionsRepository: ExecutionsRepository,
+    private readonly logsRepository: LogsRepository,
     private readonly handlers: Record<string, ActionHandler>
   ) {}
 
@@ -59,29 +62,59 @@ export class ExecuteWorkflowUseCase implements ExecuteWorkflowUseCaseInterface {
       console.log(`Executing action "${node.type}"`);
 
       let attempt = state.retries[currentId] ?? 0;
+      let success = false;
+      let lastError: Error | undefined;
 
-      const success = await this.executeWithRetry(
-        handler,
-        node,
-        currentId,
-        state,
-        maxRetries,
-        backoffBaseMs,
-        attempt
-      );
+      while (attempt <= maxRetries) {
+        try {
+          await handler.handle(node);
+          success = true;
+          break;
+        } catch (err: any) {
+          lastError = err;
 
-      if (!success) {
-        await this.saveState(state);
-        console.log(`Action "${node.type}" failed`);
-        throw new FailedExecuteWorkflowError(currentId);
+          if (attempt === maxRetries) {
+            break;
+          }
+          const delay = backoffBaseMs * 2 ** (attempt - 1);
+          await sleep(delay);
+          attempt++;
+        }
       }
 
-      console.log(`Action "${node.type}" succeeded`);
+      state.retries[currentId] = attempt;
+
+      if (success) {
+        await this.saveLog({
+          workflowId,
+          executionId: state.executionId,
+          actionId: currentId,
+          status: "success",
+          attempt,
+          message: undefined,
+        });
+      } else {
+        const promises = [
+          this.saveLog({
+            workflowId,
+            executionId: state.executionId,
+            actionId: currentId,
+            status: "failed",
+            attempt,
+            message: lastError?.message ?? "unknown error",
+          }),
+          this.saveState(state),
+        ];
+        await Promise.all(promises);
+        throw new FailedExecuteWorkflowError(
+          currentId,
+          lastError?.message ?? ""
+        );
+      }
 
       const [nextId] = node.next_ids ?? [];
       state.currentActionId = nextId;
       state.completed = !nextId;
-
       await this.saveState(state);
     }
 
@@ -106,37 +139,30 @@ export class ExecuteWorkflowUseCase implements ExecuteWorkflowUseCaseInterface {
     return state;
   }
 
-  private async executeWithRetry(
-    handler: ActionHandler,
-    node: ActionNode,
-    currentId: string,
-    state: ExecutionState,
-    maxRetries: number,
-    backoffBaseMs: number,
-    attempt = 0
-  ): Promise<boolean> {
-    attempt = 0;
-
-    while (attempt <= maxRetries) {
-      try {
-        await handler.handle(node);
-        return true;
-      } catch {
-        state.retries[currentId] = attempt;
-        attempt++;
-
-        if (attempt > maxRetries) return false;
-
-        const delay = backoffBaseMs * Math.pow(2, attempt - 1);
-        await sleep(delay);
-      }
-    }
-
-    return false;
-  }
-
   private async saveState(state: ExecutionState) {
     state.updatedAt = new Date();
     await this.executionsRepository.update(state);
+  }
+
+  private async saveLog(params: {
+    workflowId: string;
+    executionId: string;
+    actionId: string;
+    status: "success" | "failed" | "skipped";
+    attempt: number;
+    message?: string;
+  }) {
+    const { workflowId, executionId, actionId, status, attempt, message } =
+      params;
+
+    const log = WorkflowExecutionLog.createNew({
+      workflowId,
+      executionId,
+      actionId,
+      status,
+      attempt,
+      message,
+    });
+    await this.logsRepository.create(log);
   }
 }

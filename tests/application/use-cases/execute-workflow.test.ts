@@ -18,6 +18,7 @@ const fakeWorkflow = {
 describe("ExecuteWorkflowUseCase", () => {
   let workflowsRepository: any;
   let executionsRepository: any;
+  let logsRepository: any;
   let handlers: Record<string, ActionHandler>;
   let handler: ActionHandler;
   let useCase: ExecuteWorkflowUseCase;
@@ -27,6 +28,9 @@ describe("ExecuteWorkflowUseCase", () => {
     vi.spyOn(timing, "sleep").mockResolvedValue(undefined);
     workflowsRepository = {
       findById: vi.fn(),
+    };
+    logsRepository = {
+      create: vi.fn(),
     };
     executionsRepository = {
       find: vi.fn(),
@@ -40,6 +44,7 @@ describe("ExecuteWorkflowUseCase", () => {
     useCase = new ExecuteWorkflowUseCase(
       workflowsRepository,
       executionsRepository,
+      logsRepository,
       handlers
     );
   });
@@ -81,6 +86,7 @@ describe("ExecuteWorkflowUseCase", () => {
     useCase = new ExecuteWorkflowUseCase(
       workflowsRepository,
       executionsRepository,
+      logsRepository,
       {}
     );
 

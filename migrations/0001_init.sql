@@ -49,7 +49,7 @@ CREATE TABLE workflow_execution_logs (
   id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   workflow_id    UUID        NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
   execution_id   UUID        NOT NULL,
-  action_id      UUID        NOT NULL REFERENCES action_nodes(id) ON DELETE CASCADE,
+  action_id      TEXT        NOT NULL,
   status         TEXT        NOT NULL CHECK (status IN ('success', 'failed', 'skipped')),
   attempt        INTEGER     NOT NULL DEFAULT 1,
   message        TEXT,                  
