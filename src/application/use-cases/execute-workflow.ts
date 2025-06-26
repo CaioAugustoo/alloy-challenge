@@ -33,14 +33,14 @@ export class ExecuteWorkflowUseCase implements ExecuteWorkflowUseCaseInterface {
       backoffBaseMs = 500,
     } = params;
 
-    let state = await this.loadOrCreateExecution(workflowId, executionId);
-    if (state.completed) {
-      return state;
-    }
-
     const workflow = await this.workflowsRepository.findById(workflowId);
     if (!workflow) {
       throw new WorkflowNotFoundError(workflowId);
+    }
+
+    let state = await this.loadOrCreateExecution(workflowId, executionId);
+    if (state.completed) {
+      return state;
     }
 
     while (!state.completed) {
