@@ -23,7 +23,7 @@ export class Workflow {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
     public readonly createdBy: string,
-    private readonly actions: Map<string, ActionNode>
+    private actions: ActionNode[]
   ) {}
 
   static createNew(
@@ -40,12 +40,11 @@ export class Workflow {
       new Date(),
       new Date(),
       createdBy,
-      new Map()
+      []
     );
   }
 
   static createFromPersistence(record: any): Workflow {
-    const actions = new Map<string, ActionNode>(Object.entries(record.actions));
     return new Workflow(
       record.id,
       record.title,
@@ -54,7 +53,7 @@ export class Workflow {
       record.created_at,
       record.updated_at,
       record.created_by,
-      actions
+      record.actions
     );
   }
 
@@ -63,51 +62,37 @@ export class Workflow {
     title: string;
     description: string;
     triggerType: TriggerType;
-    actions: Record<string, ActionNode>;
+    actions: ActionNode[];
     createdBy: string;
     createdAt: Date;
     updatedAt: Date;
   } {
-    const actionsNodes: Record<string, ActionNode> = {};
-    const nodes = this.actions.entries();
-
-    for (const [id, node] of nodes) {
-      actionsNodes[id] = node;
-    }
-
     return {
       id: this.id,
       title: this.title,
       description: this.description,
       triggerType: this.triggerType,
-      actions: actionsNodes,
+      actions: this.actions,
       createdBy: this.createdBy,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
   }
 
-  getActions(): Record<string, ActionNode> {
-    const actions: Record<string, ActionNode> = {};
-    this.actions.forEach((value) => {
-      actions[value.action_id] = value;
-    });
-    return actions;
+  getActions(): ActionNode[] {
+    return this.actions;
   }
 
   addAction(node: ActionNode): void {
-    if (this.actions.has(node.action_id)) {
+    const found = this.actions.find((a) => a.action_id === node.action_id);
+    if (found) {
       throw new Error(`Action with id "${node.action_id}" already exists`);
     }
-    this.actions.set(node.action_id, node);
+    this.actions.push(node);
   }
 
-  updateActions(actions: Record<string, ActionNode>): void {
-    this.actions.clear();
-
-    for (const [id, node] of Object.entries(actions)) {
-      this.actions.set(id, node);
-    }
+  updateActions(actions: ActionNode[]): void {
+    this.actions = actions;
   }
 
   setTitle(title: string): void {
@@ -119,20 +104,12 @@ export class Workflow {
   }
 
   getAction(id: string): ActionNode {
-    let node = undefined;
-
-    this.actions.forEach((value) => {
-      if (value.action_id === id) {
-        node = value;
-      }
-    });
-
+    const node = this.actions.find((a) => a.action_id === id);
     if (!node) throw new Error(`Action node "${id}" not found`);
     return node;
   }
 
   get entryActionId(): string {
-    const ids = Array.from(this.actions.keys());
-    return ids[0];
+    return this.actions[0]?.action_id ?? "";
   }
 }

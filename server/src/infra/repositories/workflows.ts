@@ -27,28 +27,26 @@ export class WorkflowsRepository implements WorkflowsRepositoryInterface {
 
     if (!workflow) return;
 
-    const foundNodes = await this.db.query<ActionNode[]>(
-      `SELECT action_id, type, params, next_ids
+    const foundNodes =
+      (await this.db.query<ActionNode[]>(
+        `SELECT action_id, type, params, next_ids
          FROM action_nodes
         WHERE workflow_id = $1`,
-      [id]
-    );
+        [id]
+      )) ?? [];
 
-    const nodes = foundNodes ?? [];
+    const nodes = Array.isArray(foundNodes) ? foundNodes : [foundNodes];
 
-    const actions: Record<string, ActionNode> = {};
-    for (const node of nodes) {
-      actions[node.action_id] = {
-        action_id: node.action_id,
-        type: node.type,
-        params: node.params,
-        next_ids: (node.next_ids ?? []).length > 0 ? node.next_ids : undefined,
-      };
-    }
+    const parsedActions = (nodes ?? []).map((node) => ({
+      action_id: node.action_id,
+      type: node.type,
+      params: node.params,
+      next_ids: (node.next_ids ?? []).length > 0 ? node.next_ids : undefined,
+    }));
 
     return Workflow.createFromPersistence({
       ...workflow,
-      actions,
+      actions: parsedActions,
     });
   }
 
@@ -73,7 +71,7 @@ export class WorkflowsRepository implements WorkflowsRepositoryInterface {
 
     let actionsPromises = [];
 
-    for (const node of Object.values(actions)) {
+    actions.forEach((node) => {
       actionsPromises.push(
         this.db.query(
           `INSERT INTO action_nodes
@@ -90,7 +88,7 @@ export class WorkflowsRepository implements WorkflowsRepositoryInterface {
           ]
         )
       );
-    }
+    });
 
     await Promise.all(actionsPromises);
   }
@@ -112,7 +110,7 @@ export class WorkflowsRepository implements WorkflowsRepositoryInterface {
 
     const actionsPromises = [];
 
-    for (const node of Object.values(workflow.getActions())) {
+    workflow.getActions().forEach((node) => {
       actionsPromises.push(
         this.db.query(
           `INSERT INTO action_nodes
@@ -129,7 +127,7 @@ export class WorkflowsRepository implements WorkflowsRepositoryInterface {
           ]
         )
       );
-    }
+    });
 
     await Promise.all(actionsPromises);
 

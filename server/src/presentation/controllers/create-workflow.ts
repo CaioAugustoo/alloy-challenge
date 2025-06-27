@@ -28,7 +28,7 @@ export namespace CreateWorkflowController {
     title: string;
     description: string;
     triggerType: "time" | "webhook";
-    actions: Record<string, any>;
+    actions: any[];
     accountId: string;
   };
 }

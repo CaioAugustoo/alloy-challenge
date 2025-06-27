@@ -28,7 +28,7 @@ export namespace UpdateWorkflowController {
     title: string;
     description: string;
     workflowId: string;
-    actions: Record<string, any>;
+    actions: any[];
     accountId: string;
   };
 }

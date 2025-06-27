@@ -18,7 +18,7 @@ export namespace GetWorkflowUseCase {
       title: string;
       description: string;
       triggerType: TriggerType;
-      actions: Record<string, ActionNode>;
+      actions: ActionNode[];
       createdAt: Date;
       updatedAt: Date;
     };

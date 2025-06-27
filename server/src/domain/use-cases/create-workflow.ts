@@ -11,7 +11,7 @@ export namespace CreateWorkflowUseCase {
     title: string;
     description: string;
     triggerType: TriggerType;
-    actions: Record<string, ActionNode>;
+    actions: ActionNode[];
     accountId: string;
   };
 

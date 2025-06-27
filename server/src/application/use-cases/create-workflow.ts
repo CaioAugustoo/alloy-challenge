@@ -26,9 +26,8 @@ export class CreateWorkflowUseCase implements CreateWorkflowUseCaseInterface {
       accountId,
       triggerType
     );
-    for (const [_, node] of Object.entries(actions)) {
-      workflow.addAction(node);
-    }
+
+    workflow.updateActions(actions);
 
     await this.workflowsRepository.create(workflow);
 

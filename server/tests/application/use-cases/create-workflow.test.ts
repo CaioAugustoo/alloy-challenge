@@ -20,18 +20,18 @@ describe("CreateWorkflowUseCase", () => {
     description: "description",
     accountId: "acc-123",
     triggerType: "webhook",
-    actions: {
-      node1: {
+    actions: [
+      {
         action_id: "node1",
         type: NodeType.LOG,
         params: { message: "Hello" },
       },
-      node2: {
+      {
         action_id: "node2",
         type: NodeType.HTTP,
         params: { url: "http://test.com" },
       },
-    },
+    ],
   };
 
   beforeEach(() => {
@@ -64,6 +64,7 @@ describe("CreateWorkflowUseCase", () => {
     const fakeWorkflow = {
       id: "workflow-001",
       addAction: vi.fn(),
+      updateActions: vi.fn(),
     };
     vi.spyOn(Workflow, "createNew").mockReturnValue(fakeWorkflow as any);
 
@@ -76,7 +77,7 @@ describe("CreateWorkflowUseCase", () => {
       "acc-123",
       "webhook"
     );
-    expect(fakeWorkflow.addAction).toHaveBeenCalledTimes(2);
+    expect(fakeWorkflow.updateActions).toHaveBeenCalledTimes(1);
     expect(workflowsRepository.create).toHaveBeenCalledWith(fakeWorkflow);
     expect(result).toEqual({ workflowId: "workflow-001" });
   });

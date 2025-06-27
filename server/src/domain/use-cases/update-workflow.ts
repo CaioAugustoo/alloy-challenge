@@ -11,7 +11,7 @@ export namespace UpdateWorkflowUseCase {
     workflowId: string;
     title: string;
     description: string;
-    actions: Record<string, ActionNode>;
+    actions: ActionNode[];
     accountId: string;
   };
 

@@ -115,19 +115,19 @@ describe("WorkflowsRepository", () => {
 
       expect(Workflow.createFromPersistence).toHaveBeenCalledWith({
         ...workflowRow,
-        actions: {
-          a1: {
+        actions: [
+          {
             action_id: "a1",
             type: "log",
             params: { message: "hi" },
             next_ids: ["a2"],
           },
-          a2: {
+          {
             action_id: "a2",
             type: "delay",
             params: { ms: 100 },
           },
-        },
+        ],
       });
     });
   });
@@ -141,15 +141,15 @@ describe("WorkflowsRepository", () => {
           description: "D1",
           triggerType: "webhook",
           createdBy: "user-1",
-          actions: {
-            a1: {
+          actions: [
+            {
               action_id: "a1",
               type: "log",
               params: { msg: "hi" },
               next_ids: ["a2"],
             },
-            a2: { action_id: "a2", type: "http", params: { url: "x" } },
-          },
+            { action_id: "a2", type: "http", params: { url: "x" } },
+          ],
           createdAt: new Date("2025-01-01T00:00:00Z"),
           updatedAt: new Date("2025-01-01T00:00:00Z"),
         }),

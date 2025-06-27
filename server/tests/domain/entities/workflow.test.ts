@@ -23,7 +23,7 @@ describe("Workflow Entity", () => {
     expect(workflow.id).toBe("fake-uuid");
     expect(workflow.triggerType).toBe("time");
     expect(workflow.createdBy).toBe("user-1");
-    expect(workflow.getActions()).toEqual({});
+    expect(workflow.getActions()).toEqual([]);
     expect(workflow.createdAt).toBeInstanceOf(Date);
     expect(workflow.updatedAt).toBeInstanceOf(Date);
   });
@@ -43,7 +43,7 @@ describe("Workflow Entity", () => {
 
     workflow.addAction(action);
 
-    expect(workflow.getActions()).toEqual({ node1: action });
+    expect(workflow.getActions()).toEqual([action]);
     expect(workflow.entryActionId).toBe("node1");
     expect(workflow.getAction("node1")).toBe(action);
   });
@@ -106,8 +106,7 @@ describe("Workflow Entity", () => {
       triggerType: "webhook",
       createdBy: "creator",
     });
-    expect(persistence.actions).toHaveProperty("A", actionA);
-    expect(persistence.actions).toHaveProperty("B", actionB);
+    expect(persistence.actions).toHaveLength(2);
 
     const record = {
       id: persistence.id,
@@ -139,18 +138,18 @@ describe("Workflow Entity", () => {
       "webhook"
     );
 
-    const newActions: Record<string, ActionNode> = {
-      nodeA: {
+    const newActions: ActionNode[] = [
+      {
         action_id: "nodeA",
         type: NodeType.LOG,
         params: { message: "log A" },
       },
-      nodeB: {
+      {
         action_id: "nodeB",
         type: NodeType.DELAY,
         params: { ms: 500 },
       },
-    };
+    ];
 
     workflow.updateActions(newActions);
 
