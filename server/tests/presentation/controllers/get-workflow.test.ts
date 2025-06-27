@@ -28,7 +28,12 @@ describe("GetWorkflowController", () => {
   });
 
   test("should call useCase.execute with correct values and return ok response", async () => {
-    const workflow = Workflow.createNew("acc-123", "time");
+    const workflow = Workflow.createNew(
+      "title",
+      "description",
+      "acc-123",
+      "time"
+    );
 
     const result: GetWorkflowController.Response = { workflow: workflow };
     (useCase.execute as Mock).mockResolvedValue(result);
