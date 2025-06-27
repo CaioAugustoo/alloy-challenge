@@ -1,4 +1,4 @@
-[![CI](https://github.com/CaioAugustoo/alloy-challenge/actions/workflows/ci.yml/badge.svg)](https://github.com/CaioAugustoo/alloy-challenge/actions/workflows/ci.yml)
+[![CI · Server](https://github.com/CaioAugustoo/alloy-challenge/actions/workflows/server.yml/badge.svg)](https://github.com/CaioAugustoo/alloy-challenge/actions/workflows/server.yml)
 
 **Workflow Automation API**
 

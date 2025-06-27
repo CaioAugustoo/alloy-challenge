@@ -1,3 +1,5 @@
+[![CI · Client](https://github.com/CaioAugustoo/alloy-challenge/actions/workflows/client.yml/badge.svg)](https://github.com/CaioAugustoo/alloy-challenge/actions/workflows/client.yml)
+
 **Workflow Automation UI**
 
 A React.js UI for building and executing basic workflow automations, allowing users to define workflows composed of triggers and actions.
