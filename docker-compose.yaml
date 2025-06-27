@@ -9,8 +9,8 @@ services:
         NODE_VERSION: 22.16.0
     container_name: alloy-api
     environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://alloy:alloy@alloy-database:5432/alloy
+      - NODE_ENV=production
+        - DATABASE_URL=postgresql://alloy:alloy@alloy-database:5432/alloy
     ports:
       - "3000:3000"
     depends_on:
@@ -25,7 +25,7 @@ services:
     ports:
       - "3001:80"
     environment:
-      VITE_API_URL: http://alloy-api:3000
+      - VITE_API_URL=http://alloy-api:3000
     depends_on:
       - alloy-api
 
