@@ -16,6 +16,8 @@ describe("CreateWorkflowUseCase", () => {
   let useCase: CreateWorkflowUseCase;
 
   const params: CreateWorkflowUseCaseInterface.Params = {
+    title: "title",
+    description: "description",
     accountId: "acc-123",
     triggerType: "webhook",
     actions: {
@@ -68,7 +70,12 @@ describe("CreateWorkflowUseCase", () => {
     const result = await useCase.execute(params);
 
     expect(usersRepository.findById).toHaveBeenCalledWith("acc-123");
-    expect(Workflow.createNew).toHaveBeenCalledWith("acc-123", "webhook");
+    expect(Workflow.createNew).toHaveBeenCalledWith(
+      "title",
+      "description",
+      "acc-123",
+      "webhook"
+    );
     expect(fakeWorkflow.addAction).toHaveBeenCalledTimes(2);
     expect(workflowsRepository.create).toHaveBeenCalledWith(fakeWorkflow);
     expect(result).toEqual({ workflowId: "workflow-001" });

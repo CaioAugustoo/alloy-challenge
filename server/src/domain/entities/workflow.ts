@@ -17,6 +17,8 @@ export type ActionNode = {
 export class Workflow {
   private constructor(
     public readonly id: string,
+    public readonly title: string,
+    public readonly description: string,
     public readonly triggerType: TriggerType,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
@@ -24,9 +26,16 @@ export class Workflow {
     private readonly actions: Map<string, ActionNode>
   ) {}
 
-  static createNew(createdBy: string, triggerType: TriggerType): Workflow {
+  static createNew(
+    title: string,
+    description: string,
+    createdBy: string,
+    triggerType: TriggerType
+  ): Workflow {
     return new Workflow(
       uuid(),
+      title,
+      description,
       triggerType,
       new Date(),
       new Date(),
@@ -39,6 +48,8 @@ export class Workflow {
     const actions = new Map<string, ActionNode>(Object.entries(record.actions));
     return new Workflow(
       record.id,
+      record.title,
+      record.description,
       record.trigger_type,
       record.created_at,
       record.updated_at,
@@ -49,6 +60,8 @@ export class Workflow {
 
   toPersistence(): {
     id: string;
+    title: string;
+    description: string;
     triggerType: TriggerType;
     actions: Record<string, ActionNode>;
     createdBy: string;
@@ -64,6 +77,8 @@ export class Workflow {
 
     return {
       id: this.id,
+      title: this.title,
+      description: this.description,
       triggerType: this.triggerType,
       actions: actionsNodes,
       createdBy: this.createdBy,

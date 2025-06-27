@@ -1,13 +1,12 @@
 import { EmailInUseError } from "../../domain/errors/email-in-use";
 import { User } from "../../domain/entities/user";
+import { oneDayInSeconds } from "../../shared/timing/constants";
 import type { TokenProvider } from "../../shared/auth/token-provider";
 import type { Hasher } from "../../shared/hashing/hashing";
 import type { UsersRepository } from "../../domain/repositories/users";
-import type { CreateUserUseCase as CreateUserUseCaseInterface } from "../../domain/use-cases/create-user";
+import type { SignUpUseCase as SignUpUseCaseInterface } from "../../domain/use-cases/sign-up";
 
-const oneDayInSeconds = 1 * 24 * 3600;
-
-export class CreateUserUseCase implements CreateUserUseCaseInterface {
+export class SignUpUseCase implements SignUpUseCaseInterface {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly hasher: Hasher,
@@ -15,8 +14,8 @@ export class CreateUserUseCase implements CreateUserUseCaseInterface {
   ) {}
 
   async execute(
-    params: CreateUserUseCaseInterface.Params
-  ): Promise<CreateUserUseCaseInterface.Response> {
+    params: SignUpUseCaseInterface.Params
+  ): Promise<SignUpUseCaseInterface.Response> {
     const { name, email, password } = params;
 
     const foundUser = await this.usersRepository.findByEmail(email);

@@ -9,11 +9,23 @@ describe("AuthRoutes", () => {
     } as unknown as Router;
 
     const mockController = {} as any;
-    const authRoutes = new AuthRoutes(mockController);
+    const authRoutes = new AuthRoutes(mockController, mockController);
 
     authRoutes.register(router);
 
-    expect(router.post).toHaveBeenCalledTimes(1);
     expect(router.post).toHaveBeenCalledWith("/signup", expect.any(Function));
+  });
+
+  test("should register POST /signin route with adapted controller", () => {
+    const router = {
+      post: vi.fn(),
+    } as unknown as Router;
+
+    const mockController = {} as any;
+    const authRoutes = new AuthRoutes(mockController, mockController);
+
+    authRoutes.register(router);
+
+    expect(router.post).toHaveBeenCalledWith("/signin", expect.any(Function));
   });
 });

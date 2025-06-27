@@ -62,7 +62,12 @@ describe("DeleteWorkflowUseCase", () => {
       "123456",
       new BcryptHasher(10)
     );
-    const fakeWorkflow = Workflow.createNew("foo", "time");
+    const fakeWorkflow = Workflow.createNew(
+      "title",
+      "description",
+      "foo",
+      "time"
+    );
     vi.mocked(usersRepository.findById).mockResolvedValue(fakeUser);
     vi.mocked(workflowsRepository.findById).mockResolvedValue(fakeWorkflow);
 
@@ -78,7 +83,12 @@ describe("DeleteWorkflowUseCase", () => {
       "123456",
       new BcryptHasher(10)
     );
-    const fakeWorkflow = Workflow.createNew("fake-user", "time");
+    const fakeWorkflow = Workflow.createNew(
+      "title",
+      "description",
+      "fake-user",
+      "time"
+    );
 
     vi.mocked(usersRepository.findById).mockResolvedValue(fakeUser);
     vi.mocked(workflowsRepository.findById).mockResolvedValue(fakeWorkflow);

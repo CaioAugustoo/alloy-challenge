@@ -1,10 +1,10 @@
-import { internalServerError, ok } from "../helpers/http";
-import type { CreateUserUseCase } from "../../domain/use-cases/create-user";
+import { created, internalServerError } from "../helpers/http";
+import type { SignUpUseCase } from "../../domain/use-cases/sign-up";
 import type { Controller } from "../protocols/controller";
 import type { HttpResponse } from "../protocols/http";
 
 export class SignUpController implements Controller {
-  constructor(private readonly createUserUseCase: CreateUserUseCase) {}
+  constructor(private readonly createUserUseCase: SignUpUseCase) {}
 
   async handle(req: SignUpController.Request): Promise<HttpResponse> {
     try {
@@ -15,7 +15,7 @@ export class SignUpController implements Controller {
         email,
         password,
       });
-      return ok(res);
+      return created(res);
     } catch (error) {
       return internalServerError(error as Error);
     }

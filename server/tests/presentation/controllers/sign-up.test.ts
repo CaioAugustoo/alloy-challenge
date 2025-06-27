@@ -1,21 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Mock } from "vitest";
-import { CreateUserUseCase } from "../../../src/domain/use-cases/create-user";
-import { SignUpController } from "../../../src/presentation/controllers/signup";
+import { describe, expect, vi, beforeEach, test } from "vitest";
+import { SignUpUseCase } from "../../../src/domain/use-cases/sign-up";
+import { SignUpController } from "../../../src/presentation/controllers/sign-up";
 import { HttpResponse } from "../../../src/presentation/protocols/http";
 import {
-  badRequest,
+  created,
   internalServerError,
   ok,
 } from "../../../src/presentation/helpers/http";
+import type { Mock } from "vitest";
 
 const makeUseCase = () => {
-  const useCase: Partial<CreateUserUseCase> = { execute: vi.fn() };
-  return useCase as CreateUserUseCase;
+  const useCase: Partial<SignUpUseCase> = { execute: vi.fn() };
+  return useCase as SignUpUseCase;
 };
 
 describe("SignUpController", () => {
-  let useCase: CreateUserUseCase;
+  let useCase: SignUpUseCase;
   let controller: SignUpController;
   const request: SignUpController.Request = {
     name: "John",
@@ -29,7 +29,7 @@ describe("SignUpController", () => {
     controller = new SignUpController(useCase);
   });
 
-  it("should call createUserUseCase and return ok on success", async () => {
+  test("should call SignUpUseCase and return ok on success", async () => {
     const user = { id: "user-1", name: request.name, email: request.email };
     (useCase.execute as Mock).mockResolvedValue(user);
 
@@ -40,12 +40,12 @@ describe("SignUpController", () => {
       email: request.email,
       password: request.password,
     });
-    expect(response).toEqual(ok(user));
-    expect(response.statusCode).toBe(200);
+    expect(response).toEqual(created(user));
+    expect(response.statusCode).toBe(201);
     expect(response.body).toBe(user);
   });
 
-  it("should return internalServerError if createUserUseCase throws", async () => {
+  test("should return internalServerError if SignUpUseCase throws", async () => {
     const error = new Error("use case failed");
     (useCase.execute as Mock).mockRejectedValue(error);
 

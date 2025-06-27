@@ -13,14 +13,19 @@ export class CreateWorkflowUseCase implements CreateWorkflowUseCaseInterface {
   async execute(
     params: CreateWorkflowUseCaseInterface.Params
   ): Promise<CreateWorkflowUseCaseInterface.Response> {
-    const { triggerType, actions } = params;
+    const { triggerType, actions, accountId, description, title } = params;
 
     const createdBy = await this.usersRepository.findById(params.accountId);
     if (!createdBy) {
       throw new UserNotFoundError(params.accountId);
     }
 
-    const workflow = Workflow.createNew(params.accountId, triggerType);
+    const workflow = Workflow.createNew(
+      title,
+      description,
+      accountId,
+      triggerType
+    );
     for (const [_, node] of Object.entries(actions)) {
       workflow.addAction(node);
     }

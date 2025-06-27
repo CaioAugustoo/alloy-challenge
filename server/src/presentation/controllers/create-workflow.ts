@@ -8,8 +8,10 @@ export class CreateWorkflowController implements Controller {
 
   async handle(req: CreateWorkflowController.Request): Promise<HttpResponse> {
     try {
-      const { triggerType, accountId, actions } = req;
+      const { title, description, triggerType, accountId, actions } = req;
       const res = await this.createWorkflowUseCase.execute({
+        title,
+        description,
         triggerType,
         accountId,
         actions,
@@ -23,6 +25,8 @@ export class CreateWorkflowController implements Controller {
 
 export namespace CreateWorkflowController {
   export type Request = {
+    title: string;
+    description: string;
     triggerType: "time" | "webhook";
     actions: Record<string, any>;
     accountId: string;

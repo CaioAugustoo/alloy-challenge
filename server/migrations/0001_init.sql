@@ -9,6 +9,8 @@ CREATE TABLE users (
 
 CREATE TABLE workflows (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  title        TEXT        NOT NULL,
+  description  TEXT,
   trigger_type TEXT        NOT NULL  CHECK (trigger_type IN ('time', 'webhook')),
   created_by   UUID        NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

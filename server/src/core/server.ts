@@ -2,8 +2,8 @@ import express from "express";
 import env from "./env";
 import { Postgres } from "../infra/database/adapters/postgres";
 import { AuthRoutes } from "./routes/auth";
-import { SignUpController } from "../presentation/controllers/signup";
-import { CreateUserUseCase } from "../application/use-cases/create-user";
+import { SignUpController } from "../presentation/controllers/sign-up";
+import { SignUpUseCase } from "../application/use-cases/sign-up";
 import { BcryptHasher } from "../shared/hashing/bcrypt";
 import { UsersRepository } from "../infra/repositories/users";
 import { bodyParser } from "./middlewares/body-parser";
@@ -31,6 +31,8 @@ import { DeleteWorkflowController } from "../presentation/controllers/delete-wor
 import { GetWorkflowUseCase } from "../application/use-cases/get-workflow";
 import { GetWorkflowController } from "../presentation/controllers/get-workflow";
 import { LogsRepository } from "../infra/repositories/logs";
+import { SignInUseCase } from "../application/use-cases/sign-in";
+import { SignInController } from "../presentation/controllers/sign-in";
 
 const app = express();
 app.use(bodyParser);
@@ -55,7 +57,12 @@ const initApp = async () => {
   const executionsRepository = new WorkflowExecutionsRepository(db);
   const logsRepository = new LogsRepository(db);
 
-  const createUserUseCase = new CreateUserUseCase(
+  const signUpUsecase = new SignUpUseCase(
+    usersRepository,
+    hasher,
+    tokenProvider
+  );
+  const signInUseCase = new SignInUseCase(
     usersRepository,
     hasher,
     tokenProvider
@@ -84,7 +91,8 @@ const initApp = async () => {
     usersRepository
   );
 
-  const signUpController = new SignUpController(createUserUseCase);
+  const signUpController = new SignUpController(signUpUsecase);
+  const signInController = new SignInController(signInUseCase);
 
   const getWorkflowController = new GetWorkflowController(getWorkflowUseCase);
   const createWorkflowController = new CreateWorkflowController(
@@ -100,7 +108,7 @@ const initApp = async () => {
     deleteWorkflowUseCase
   );
 
-  const authRoutes = new AuthRoutes(signUpController);
+  const authRoutes = new AuthRoutes(signUpController, signInController);
   const workflowsRoutes = new WorkflowsRoutes(
     createWorkflowController,
     listWorkflowsController,

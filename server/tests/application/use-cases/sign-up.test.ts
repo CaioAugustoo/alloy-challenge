@@ -3,16 +3,16 @@ import { UsersRepository } from "../../../src/domain/repositories/users";
 import { Hasher } from "../../../src/shared/hashing/hashing";
 import { TokenProvider } from "../../../src/shared/auth/token-provider";
 import { EmailInUseError } from "../../../src/domain/errors/email-in-use";
-import { CreateUserUseCase } from "../../../src/application/use-cases/create-user";
+import { SignUpUseCase } from "../../../src/application/use-cases/sign-up";
 import { User } from "../../../src/domain/entities/user";
 
 vi.mock("../../domain/entities/user");
 
-describe("CreateUserUseCase", () => {
+describe("SignUpUseCase", () => {
   let usersRepository: UsersRepository;
   let hasher: Hasher;
   let tokenProvider: TokenProvider;
-  let useCase: CreateUserUseCase;
+  let useCase: SignUpUseCase;
 
   const userParams = {
     name: "John Doe",
@@ -37,7 +37,7 @@ describe("CreateUserUseCase", () => {
       verify: vi.fn(),
     };
 
-    useCase = new CreateUserUseCase(usersRepository, hasher, tokenProvider);
+    useCase = new SignUpUseCase(usersRepository, hasher, tokenProvider);
   });
 
   test("should throw EmailInUseError if user already exists", async () => {

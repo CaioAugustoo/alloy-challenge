@@ -13,7 +13,12 @@ describe("Workflow Entity", () => {
   });
 
   test("should create new workflow with proper properties", () => {
-    const workflow = Workflow.createNew("user-1", "time");
+    const workflow = Workflow.createNew(
+      "title",
+      "description",
+      "user-1",
+      "time"
+    );
 
     expect(workflow.id).toBe("fake-uuid");
     expect(workflow.triggerType).toBe("time");
@@ -24,7 +29,12 @@ describe("Workflow Entity", () => {
   });
 
   test("should add and retrieve an action correctly", () => {
-    const workflow = Workflow.createNew("user-2", "webhook");
+    const workflow = Workflow.createNew(
+      "title-2",
+      "description-2",
+      "user-2",
+      "webhook"
+    );
     const action: ActionNode = {
       action_id: "node1",
       type: NodeType.LOG,
@@ -39,7 +49,12 @@ describe("Workflow Entity", () => {
   });
 
   test("should throw when adding a duplicate action", () => {
-    const workflow = Workflow.createNew("user-3", "time");
+    const workflow = Workflow.createNew(
+      "title-3",
+      "description-3",
+      "user-3",
+      "time"
+    );
     const action: ActionNode = {
       action_id: "dup",
       type: NodeType.HTTP,
@@ -52,14 +67,24 @@ describe("Workflow Entity", () => {
   });
 
   test("should throw when retrieving a non-existent action", () => {
-    const workflow = Workflow.createNew("user-4", "time");
+    const workflow = Workflow.createNew(
+      "title-4",
+      "description-4",
+      "user-4",
+      "time"
+    );
     expect(() => workflow.getAction("not-found")).toThrowError(
       'Action node "not-found" not found'
     );
   });
 
   test("should serialize to persistence and recreate from persistence", () => {
-    const workflow = Workflow.createNew("creator", "webhook");
+    const workflow = Workflow.createNew(
+      "title",
+      "description",
+      "creator",
+      "webhook"
+    );
     const actionA: ActionNode = {
       action_id: "A",
       type: NodeType.DELAY,
@@ -76,6 +101,8 @@ describe("Workflow Entity", () => {
     const persistence = workflow.toPersistence();
     expect(persistence).toMatchObject({
       id: "fake-uuid",
+      title: "title",
+      description: "description",
       triggerType: "webhook",
       createdBy: "creator",
     });
@@ -84,6 +111,8 @@ describe("Workflow Entity", () => {
 
     const record = {
       id: persistence.id,
+      title: persistence.title,
+      description: persistence.description,
       trigger_type: persistence.triggerType,
       created_by: persistence.createdBy,
       created_at: persistence.createdAt,
@@ -93,6 +122,8 @@ describe("Workflow Entity", () => {
 
     const rehydrated = Workflow.createFromPersistence(record);
     expect(rehydrated.id).toBe(persistence.id);
+    expect(rehydrated.title).toBe(persistence.title);
+    expect(rehydrated.description).toBe(persistence.description);
     expect(rehydrated.triggerType).toBe(persistence.triggerType);
     expect(rehydrated.createdBy).toBe(persistence.createdBy);
     expect(rehydrated.createdAt).toBe(persistence.createdAt);

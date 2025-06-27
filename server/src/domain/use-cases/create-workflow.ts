@@ -8,6 +8,8 @@ export interface CreateWorkflowUseCase {
 
 export namespace CreateWorkflowUseCase {
   export type Params = {
+    title: string;
+    description: string;
     triggerType: TriggerType;
     actions: Record<string, ActionNode>;
     accountId: string;

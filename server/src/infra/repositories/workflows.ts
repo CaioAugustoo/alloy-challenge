@@ -18,7 +18,7 @@ export class WorkflowsRepository implements WorkflowsRepositoryInterface {
 
   async findById(id: string): Promise<Workflow | undefined> {
     const workflow = await this.db.query<Workflow>(
-      `SELECT id, trigger_type, created_by, created_at, updated_at
+      `SELECT id, title, description, trigger_type, created_by, created_at, updated_at
          FROM workflows
         WHERE id = $1
         LIMIT 1`,
@@ -53,14 +53,22 @@ export class WorkflowsRepository implements WorkflowsRepositoryInterface {
   }
 
   async create(workflow: Workflow): Promise<void> {
-    const { id, triggerType, createdBy, actions, createdAt, updatedAt } =
-      workflow.toPersistence();
+    const {
+      id,
+      title,
+      description,
+      triggerType,
+      createdBy,
+      actions,
+      createdAt,
+      updatedAt,
+    } = workflow.toPersistence();
 
     await this.db.query(
       `INSERT INTO workflows
-         (id, trigger_type, created_by, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [id, triggerType, createdBy, createdAt, updatedAt]
+         (id, title, description, trigger_type, created_by, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [id, title, description, triggerType, createdBy, createdAt, updatedAt]
     );
 
     let actionsPromises = [];
