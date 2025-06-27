@@ -41,7 +41,7 @@ describe("WorkflowsRepository", () => {
       await repo.listWorkflows("user-42");
       expect(db.query).toHaveBeenCalledWith(
         expect.stringContaining(
-          "SELECT * FROM workflows WHERE created_by = $1"
+          "SELECT * FROM workflows WHERE created_by = $1 ORDER BY created_at DESC"
         ),
         ["user-42"]
       );

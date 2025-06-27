@@ -7,7 +7,7 @@ export class WorkflowsRepository implements WorkflowsRepositoryInterface {
 
   async listWorkflows(userId: string): Promise<Workflow[]> {
     const workflows = await this.db.query<Workflow[]>(
-      "SELECT * FROM workflows WHERE created_by = $1",
+      "SELECT * FROM workflows WHERE created_by = $1 ORDER BY created_at DESC",
       [userId]
     );
 
