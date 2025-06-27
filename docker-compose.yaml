@@ -10,7 +10,7 @@ services:
     container_name: alloy-api
     environment:
       - NODE_ENV=production
-        - DATABASE_URL=postgresql://alloy:alloy@alloy-database:5432/alloy
+      - DATABASE_URL=postgresql://alloy:alloy@alloy-database:5432/alloy
     ports:
       - "3000:3000"
     depends_on:
