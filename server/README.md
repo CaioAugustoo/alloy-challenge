@@ -258,7 +258,7 @@ Create a new workflow.
 curl --request POST \
   --url http://localhost:3000/workflows \
   --header 'Content-Type: application/json' \
-  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>' \
+  --header 'access-token: <YOUR TOKEN FROM AUTH ENDPOINTS>' \
   --data '{
 	"triggerType": "webhook",
 	"actions": [
@@ -322,7 +322,7 @@ Execute a workflow.
 curl --request POST \
   --url http://localhost:3000/workflows/81a8b0a9-36a6-468c-b980-14561d452e0a/executions \
   --header 'Content-Type: application/json' \
-  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>' \
+  --header 'access-token: <YOUR TOKEN FROM AUTH ENDPOINTS>' \
   --data '{
 	"maxRetries": 3,
 	"backoffBaseMs": 1000
@@ -356,7 +356,7 @@ When workflow execution fails, you can retry it by providing the `executionId` i
 curl --request POST \
   --url http://localhost:3000/workflows/81a8b0a9-36a6-468c-b980-14561d452e0a/executions \
   --header 'Content-Type: application/json' \
-  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>' \
+  --header 'access-token: <YOUR TOKEN FROM AUTH ENDPOINTS>' \
   --data '{
 	"maxRetries": 3,
 	"backoffBaseMs": 1000,
@@ -377,7 +377,7 @@ Get a workflow by id.
 ```bash
 curl --request GET \
   --url http://localhost:3000/workflows/b399904f-f256-4419-ac62-d829f5ef60d2 \
-  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>'
+  --header 'access-token: <YOUR TOKEN FROM AUTH ENDPOINTS>'
 ```
 
 The response will contain the workflow.
@@ -409,7 +409,7 @@ List all workflows.
 ```bash
 curl --request GET \
   --url http://localhost:3000/workflows \
-  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>'
+  --header 'access-token: <YOUR TOKEN FROM AUTH ENDPOINTS>'
 ```
 
 The response will contain an array of workflows.
@@ -448,7 +448,7 @@ Delete a workflow.
 ```bash
 curl --request DELETE \
   --url http://localhost:3000/workflows/ebe13a0f-2b66-4f70-9c38-42d71fd40caf \
-  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>'
+  --header 'access-token: <YOUR TOKEN FROM AUTH ENDPOINTS>'
 ```
 
 The response will return 204 HTTP Status Code if the workflow was deleted successfully.
@@ -467,7 +467,7 @@ Update a workflow.
 curl --request PUT \
   --url http://localhost:3000/workflows/95bd82ee-8489-44bd-bf22-5e813d51dff4 \
   --header 'Content-Type: application/json' \
-  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>' \
+  --header 'access-token: <YOUR TOKEN FROM AUTH ENDPOINTS>' \
   --data '{
 	"title": "Demo Alloy",
 	"description": "Just a demo",
