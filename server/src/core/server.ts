@@ -33,6 +33,8 @@ import { GetWorkflowController } from "../presentation/controllers/get-workflow"
 import { LogsRepository } from "../infra/repositories/logs";
 import { SignInUseCase } from "../application/use-cases/sign-in";
 import { SignInController } from "../presentation/controllers/sign-in";
+import { UpdateWorkflowUseCase } from "../application/use-cases/update-workflow";
+import { UpdateWorkflowController } from "../presentation/controllers/update-workflow";
 
 const app = express();
 app.use(bodyParser);
@@ -90,6 +92,10 @@ const initApp = async () => {
     workflowsRepository,
     usersRepository
   );
+  const updateWorkflowUseCase = new UpdateWorkflowUseCase(
+    workflowsRepository,
+    usersRepository
+  );
 
   const signUpController = new SignUpController(signUpUsecase);
   const signInController = new SignInController(signInUseCase);
@@ -107,6 +113,9 @@ const initApp = async () => {
   const deleteWorkflowController = new DeleteWorkflowController(
     deleteWorkflowUseCase
   );
+  const updateWorkflowController = new UpdateWorkflowController(
+    updateWorkflowUseCase
+  );
 
   const authRoutes = new AuthRoutes(signUpController, signInController);
   const workflowsRoutes = new WorkflowsRoutes(
@@ -115,6 +124,7 @@ const initApp = async () => {
     executeWorkflowController,
     deleteWorkflowController,
     getWorkflowController,
+    updateWorkflowController,
     tokenProvider
   );
 

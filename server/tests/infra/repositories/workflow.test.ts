@@ -12,31 +12,35 @@ describe("WorkflowsRepository", () => {
   });
 
   describe("listWorkflows", () => {
-    test("should returns empty array when db.query returns undefined", async () => {
+    test("should return empty array when db.query returns undefined", async () => {
       db.query.mockResolvedValueOnce(undefined);
       const result = await repo.listWorkflows("user-1");
       expect(result).toEqual([]);
     });
 
-    test("should wraps single workflow into array", async () => {
-      const wf = { id: "wf-1" } as unknown as Workflow;
+    test("should wrap single workflow into array", async () => {
+      const wf = {
+        id: "wf-1",
+        title: "T1",
+        description: "D1",
+      } as unknown as Workflow;
       db.query.mockResolvedValueOnce(wf);
       const result = await repo.listWorkflows("user-1");
       expect(Array.isArray(result)).toBe(true);
       expect(result).toEqual([wf]);
     });
 
-    test("should returns array when db.query returns array", async () => {
+    test("should return array when db.query returns array", async () => {
       const wfs = [
-        { id: "wf-1" } as unknown as Workflow,
-        { id: "wf-2" } as unknown as Workflow,
+        { id: "wf-1", title: "T1", description: "D1" } as unknown as Workflow,
+        { id: "wf-2", title: "T2", description: "D2" } as unknown as Workflow,
       ];
       db.query.mockResolvedValueOnce(wfs);
       const result = await repo.listWorkflows("user-1");
       expect(result).toEqual(wfs);
     });
 
-    test("should calls db.query with correct SQL and parameter", async () => {
+    test("should call db.query with correct SQL and parameter", async () => {
       db.query.mockResolvedValueOnce([]);
       await repo.listWorkflows("user-42");
       expect(db.query).toHaveBeenCalledWith(
@@ -51,6 +55,8 @@ describe("WorkflowsRepository", () => {
   describe("findById", () => {
     const workflowRow = {
       id: "wf-1",
+      title: "T1",
+      description: "D1",
       trigger_type: "time",
       created_by: "user-1",
       created_at: new Date().toISOString(),
@@ -83,16 +89,16 @@ describe("WorkflowsRepository", () => {
       );
     });
 
-    test("should returns undefined when workflow not found", async () => {
+    test("should return undefined when workflow not found", async () => {
       db.query.mockResolvedValueOnce(undefined);
       const result = await repo.findById("missing");
       expect(result).toBeUndefined();
     });
 
-    test("should reconstructs Workflow from DB rows", async () => {
+    test("should reconstruct Workflow from DB rows", async () => {
       db.query
-        .mockResolvedValueOnce(workflowRow)
-        .mockResolvedValueOnce(nodeRows);
+        .mockResolvedValueOnce(workflowRow) // workflow
+        .mockResolvedValueOnce(nodeRows); // nodes
 
       await repo.findById("wf-1");
 
@@ -127,10 +133,12 @@ describe("WorkflowsRepository", () => {
   });
 
   describe("create", () => {
-    test("should inserts workflow and its actions", async () => {
+    test("should insert workflow and its actions", async () => {
       const fakeWorkflow = {
         toPersistence: () => ({
           id: "wf-1",
+          title: "T1",
+          description: "D1",
           triggerType: "webhook",
           createdBy: "user-1",
           actions: {
@@ -153,6 +161,8 @@ describe("WorkflowsRepository", () => {
         expect.stringContaining("INSERT INTO workflows"),
         expect.arrayContaining([
           "wf-1",
+          "T1",
+          "D1",
           "webhook",
           "user-1",
           new Date("2025-01-01T00:00:00Z"),
@@ -188,7 +198,7 @@ describe("WorkflowsRepository", () => {
   });
 
   describe("delete", () => {
-    test("should deletes workflow by id", async () => {
+    test("should delete workflow by id", async () => {
       await repo.delete("wf-1");
       expect(db.query).toHaveBeenCalledWith(
         expect.stringContaining("DELETE FROM workflows"),

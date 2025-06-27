@@ -130,4 +130,57 @@ describe("Workflow Entity", () => {
     expect(rehydrated.updatedAt).toBe(persistence.updatedAt);
     expect(rehydrated.getActions()).toEqual(persistence.actions);
   });
+
+  test("should update actions with updateActions", () => {
+    const workflow = Workflow.createNew(
+      "old-title",
+      "old-description",
+      "user-5",
+      "webhook"
+    );
+
+    const newActions: Record<string, ActionNode> = {
+      nodeA: {
+        action_id: "nodeA",
+        type: NodeType.LOG,
+        params: { message: "log A" },
+      },
+      nodeB: {
+        action_id: "nodeB",
+        type: NodeType.DELAY,
+        params: { ms: 500 },
+      },
+    };
+
+    workflow.updateActions(newActions);
+
+    expect(workflow.getActions()).toEqual(newActions);
+    expect(workflow.entryActionId).toBe("nodeA");
+  });
+
+  test("should update the title with setTitle", () => {
+    const workflow = Workflow.createNew(
+      "initial-title",
+      "description",
+      "user-6",
+      "time"
+    );
+
+    workflow.setTitle("new-updated-title");
+
+    expect(workflow.title).toBe("new-updated-title");
+  });
+
+  test("should update the description with setDescription", () => {
+    const workflow = Workflow.createNew(
+      "title",
+      "initial-description",
+      "user-7",
+      "time"
+    );
+
+    workflow.setDescription("updated-description");
+
+    expect(workflow.description).toBe("updated-description");
+  });
 });

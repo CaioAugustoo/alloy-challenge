@@ -30,7 +30,12 @@ describe("WorkflowsRoutes", () => {
   let routes: WorkflowsRoutes;
 
   beforeEach(() => {
-    router = { post: vi.fn(), get: vi.fn(), delete: vi.fn() } as any;
+    router = {
+      post: vi.fn(),
+      get: vi.fn(),
+      delete: vi.fn(),
+      put: vi.fn(),
+    } as any;
     controllers = {
       create: {} as Controller,
       get: {} as Controller,
@@ -46,6 +51,7 @@ describe("WorkflowsRoutes", () => {
       controllers.execute,
       controllers.delete,
       controllers.get,
+      controllers.update,
       tokenProvider
     );
 

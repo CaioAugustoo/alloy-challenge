@@ -17,8 +17,8 @@ export type ActionNode = {
 export class Workflow {
   private constructor(
     public readonly id: string,
-    public readonly title: string,
-    public readonly description: string,
+    public title: string,
+    public description: string,
     public readonly triggerType: TriggerType,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
@@ -100,6 +100,22 @@ export class Workflow {
       throw new Error(`Action with id "${node.action_id}" already exists`);
     }
     this.actions.set(node.action_id, node);
+  }
+
+  updateActions(actions: Record<string, ActionNode>): void {
+    this.actions.clear();
+
+    for (const [id, node] of Object.entries(actions)) {
+      this.actions.set(id, node);
+    }
+  }
+
+  setTitle(title: string): void {
+    this.title = title;
+  }
+
+  setDescription(description: string): void {
+    this.description = description;
   }
 
   getAction(id: string): ActionNode {

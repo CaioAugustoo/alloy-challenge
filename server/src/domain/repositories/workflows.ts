@@ -5,4 +5,5 @@ export interface WorkflowsRepository {
   create(workflow: Workflow): Promise<void>;
   findById(id: string): Promise<Workflow | undefined>;
   delete(id: string): Promise<void>;
+  update(id: string, workflow: Workflow): Promise<void>;
 }

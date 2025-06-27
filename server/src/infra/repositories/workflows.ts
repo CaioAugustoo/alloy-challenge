@@ -102,4 +102,42 @@ export class WorkflowsRepository implements WorkflowsRepositoryInterface {
       [id]
     );
   }
+
+  async update(id: string, workflow: Workflow): Promise<void> {
+    await this.db.query(
+      `DELETE FROM action_nodes
+         WHERE workflow_id = $1`,
+      [id]
+    );
+
+    const actionsPromises = [];
+
+    for (const node of Object.values(workflow.getActions())) {
+      actionsPromises.push(
+        this.db.query(
+          `INSERT INTO action_nodes
+             (action_id, workflow_id, type, params, next_ids, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [
+            node.action_id,
+            id,
+            node.type,
+            node.params,
+            node.next_ids ?? [],
+            new Date(),
+            new Date(),
+          ]
+        )
+      );
+    }
+
+    await Promise.all(actionsPromises);
+
+    await this.db.query(
+      `UPDATE workflows
+         SET title = $2, description = $3
+         WHERE id = $1`,
+      [id, workflow.title, workflow.description]
+    );
+  }
 }

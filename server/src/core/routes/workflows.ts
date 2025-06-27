@@ -11,6 +11,7 @@ export class WorkflowsRoutes {
     private readonly executeWorkflowController: Controller,
     private readonly deleteWorkflowController: Controller,
     private readonly getWorkflowController: Controller,
+    private readonly updateWorkflowController: Controller,
     private readonly tokenProvider: TokenProvider
   ) {}
 
@@ -45,6 +46,12 @@ export class WorkflowsRoutes {
       "/workflows/:workflowId",
       authMiddleware,
       adaptRoute(this.deleteWorkflowController)
+    );
+
+    router.put(
+      "/workflows/:workflowId",
+      authMiddleware,
+      adaptRoute(this.updateWorkflowController)
     );
   }
 }
