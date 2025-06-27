@@ -25,7 +25,7 @@ services:
     ports:
       - "3001:80"
     environment:
-      VITE_API_BASE_URL: http://alloy-api:3000
+      VITE_API_URL: http://alloy-api:3000
     depends_on:
       - alloy-api
 
