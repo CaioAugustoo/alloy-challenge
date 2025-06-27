@@ -1,6 +1,6 @@
 # Generated using `docker init` command :)
 
-ARG NODE_VERSION=20.19.0
+ARG NODE_VERSION=22.16.0
 
 ################################################################################
 # Use node image for base image for all stages.

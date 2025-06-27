@@ -76,7 +76,6 @@ export function SpeedDial({ addNode }: SpeedDialProps) {
   };
 
   const handleActionClick = (action: Action) => {
-    console.log(`${JSON.stringify(action)} clicked`);
     addNode(action);
     setIsOpen(false);
   };

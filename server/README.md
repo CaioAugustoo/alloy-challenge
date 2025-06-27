@@ -152,7 +152,7 @@ The algorithm will retry the failed action with exponential backoff until the `m
 
 ### Prerequisites
 
-- Node.js ≥ 18
+- Node.js ≥ 22
 - Docker & Docker Compose
 - npm or yarn
 
@@ -162,18 +162,12 @@ The algorithm will retry the failed action with exponential backoff until the `m
 
    ```bash
    git clone https://github.com/CaioAugustoo/alloy-challenge.git
-   cd alloy-challenge
-   ```
-
-2. Install dependencies
-
-   ```
-   npm install
+   cd alloy-challenge && cd server
    ```
 
 ---
 
-## Running the Application
+2. Run the application
 
 ### With Docker Compose
 
@@ -193,7 +187,7 @@ The API will be available at `http://localhost:3000`. Also a postgres database w
 
 This project is a REST API built with Express.js. Endpoints are defined in the `src/core/routes` directory.
 
-The API uses JWT authentication except for the `/signup` endpoint. The `/signup` endpoint is used to register new users.
+The API uses JWT authentication except for the `/signup` and `/signin` endpoint.
 
 **The focus of this project is on the workflow automation, so the API is designed to handle workflows and their executions and not to provide a complete CRUD API for users, workflows, and actions, even though it would be nice to have in the future.**
 
@@ -210,7 +204,7 @@ curl --request POST \
   --data '{
 	"name": "caio augusto",
 	"email": "caioamfr@gmail.com",
-	"password": "12345677"
+	"password": "1234567"
 }'
 ```
 
@@ -226,6 +220,32 @@ The response will contain the access token.
 
 ---
 
+### POST sigin
+
+Sign in to the API.
+
+**Curl Example**
+
+```bash
+curl --request POST \
+  --url http://localhost:3000/signin \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"email": "caioamfr@gmail.com",
+	"password": "123456"
+}'
+```
+
+The response will contain the access token. The access token is valid for one day and it must be used to authenticate requests to the API.
+
+```json
+{
+  "accessToken": "..."
+}
+```
+
+---
+
 #### POST /workflows
 
 Create a new workflow.
@@ -238,7 +258,7 @@ Create a new workflow.
 curl --request POST \
   --url http://localhost:3000/workflows \
   --header 'Content-Type: application/json' \
-  --header 'access-token: <YOUR TOKEN FROM SIGNUP ENDPOINT>' \
+  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>' \
   --data '{
 	"triggerType": "webhook",
 	"actions": [
@@ -302,7 +322,7 @@ Execute a workflow.
 curl --request POST \
   --url http://localhost:3000/workflows/81a8b0a9-36a6-468c-b980-14561d452e0a/executions \
   --header 'Content-Type: application/json' \
-  --header 'access-token: <YOUR TOKEN FROM SIGNUP ENDPOINT>' \
+  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>' \
   --data '{
 	"maxRetries": 3,
 	"backoffBaseMs": 1000
@@ -336,7 +356,7 @@ When workflow execution fails, you can retry it by providing the `executionId` i
 curl --request POST \
   --url http://localhost:3000/workflows/81a8b0a9-36a6-468c-b980-14561d452e0a/executions \
   --header 'Content-Type: application/json' \
-  --header 'access-token: <YOUR TOKEN FROM SIGNUP ENDPOINT>' \
+  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>' \
   --data '{
 	"maxRetries": 3,
 	"backoffBaseMs": 1000,
@@ -357,7 +377,7 @@ Get a workflow by id.
 ```bash
 curl --request GET \
   --url http://localhost:3000/workflows/b399904f-f256-4419-ac62-d829f5ef60d2 \
-  --header 'access-token: <YOUR TOKEN FROM SIGNUP ENDPOINT>'
+  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>'
 ```
 
 The response will contain the workflow.
@@ -389,7 +409,7 @@ List all workflows.
 ```bash
 curl --request GET \
   --url http://localhost:3000/workflows \
-  --header 'access-token: <YOUR TOKEN FROM SIGNUP ENDPOINT>'
+  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>'
 ```
 
 The response will contain an array of workflows.
@@ -413,6 +433,70 @@ The response will contain an array of workflows.
     }
   ]
 }
+```
+
+---
+
+### DELETE /workflows/:workflowId
+
+Delete a workflow.
+
+**Curl Example**
+
+```bash
+curl --request DELETE \
+  --url http://localhost:3000/workflows/ebe13a0f-2b66-4f70-9c38-42d71fd40caf \
+  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>'
+```
+
+The response will return 204 HTTP Status Code if the workflow was deleted successfully.
+
+---
+
+### PUT /workflows/:workflowId
+
+Update a workflow.
+
+**Curl Example**
+
+```bash
+curl --request PUT \
+  --url http://localhost:3000/workflows/95bd82ee-8489-44bd-bf22-5e813d51dff4 \
+  --header 'Content-Type: application/json' \
+  --header 'access-token: <YOUR TOKEN AUTH ENDPOINTS>' \
+  --data '{
+	"title": "Demo Alloy",
+	"description": "Just a demo",
+	"actions": [
+		{
+			"action_id": "a2",
+			"type": "delay",
+			"params": {
+				"ms": 1000
+			},
+			"next_ids": [
+				"a1"
+			]
+		},
+		{
+			"action_id": "a1",
+			"type": "log",
+			"params": {
+				"message": "Start!"
+			}
+		},
+		{
+			"action_id": "a4",
+			"type": "http",
+			"params": {
+				"url": "https://google.com"
+			},
+			"next_ids": [
+				"a2"
+			]
+		}
+	]
+}'
 ```
 
 ---
@@ -460,7 +544,6 @@ As I mentioned earlier, this project is a learning exercise and a way to practic
 - Add more features like support for more triggers and actions
 - Add swagger documentation
 - More CRUD operations for users, workflows, and actions
-- UI for creating and managing workflows
   ...
 
 ---

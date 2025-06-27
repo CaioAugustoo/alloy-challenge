@@ -5,7 +5,7 @@ import { LogIcon } from "../icons/log";
 type LogNodeData = {
   label: string;
   params: {
-    content: string;
+    message: string;
   };
 };
 
@@ -26,7 +26,7 @@ export default memo(({ data, isConnectable }: LogNodeProps) => {
           <p className="font-medium text-sm truncate min-w-[150px] max-w-[250px]">
             Log{" "}
             <span className="font-bold text-purple-500">
-              {data.params.content}
+              {data.params.message}
             </span>
           </p>
         </div>
@@ -35,7 +35,6 @@ export default memo(({ data, isConnectable }: LogNodeProps) => {
       <Handle
         type="target"
         position={Position.Left}
-        onConnect={(params) => console.log("handle onConnect", params)}
         isConnectable={isConnectable}
       />
       <Handle

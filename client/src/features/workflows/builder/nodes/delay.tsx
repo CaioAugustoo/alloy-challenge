@@ -32,7 +32,6 @@ export default memo(({ data, isConnectable }: DelayNodeProps) => {
       <Handle
         type="target"
         position={Position.Left}
-        onConnect={(params) => console.log("handle onConnect", params)}
         isConnectable={isConnectable}
       />
       <Handle

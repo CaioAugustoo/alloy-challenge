@@ -1,69 +1,146 @@
-# React + TypeScript + Vite
+**Workflow Automation UI**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React.js UI for building and executing basic workflow automations, allowing users to define workflows composed of triggers and actions.
 
-Currently, two official plugins are available:
+This project was not challenged to be built, but I decided to build it anyway because I liked a lot this challenge!
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Table of Contents
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Folder Structure](#folder-structure)
+- [Running the Application](#running-the-application)
+- [Screenshots](#screenshots)
+- [Contributing](#contributing)
+- [Testing](#testing)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Overview
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+This project is a React.js UI for building and executing basic workflow automations, allowing users to define workflows composed of triggers and actions.
+
+---
+
+### Features
+
+The project consists of two main features:
+
+- Workflow Builder: A visual editor for building workflows.
+- Auth: A login and registration system for users.
+
+---
+
+## Tech Stack
+
+The project uses the following technologies:
+
+- React.js: A JavaScript library for building user interfaces.
+- Tailwind CSS: A utility-first CSS framework for styling.
+- TypeScript: A superset of JavaScript that adds static typing.
+
+---
+
+### Folder Structure
+
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+├── src
+│ ├── components
+│ ├── features
+│ ├── lib
+│ ├── routes.tsx
+│ ├── services
+│ ├── utils
+│ └── index.tsx
+├── tailwind.config.js
+├── tsconfig.json
+└── vite.config.ts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+
+- **components/**: Reusable React components.
+- **features/**: The main features of the application, including the workflow builder and the auth system.
+- **lib/**: Third-party libraries and utilities.
+- **services/**: Services for interacting with the backend API.
+- **utils/**: Utility functions and types.
+- **index.tsx**: The entry point of the application.
+- **tailwind.config.js**: Tailwind CSS configuration.
+- **tsconfig.json**: TypeScript configuration.
+- **vite.config.ts**: Vite configuration.
+
+### Prerequisites
+
+- Node.js ≥ 22
+- Docker & Docker Compose
+- npm or yarn
+
+---
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/CaioAugustoo/alloy-challenge.git
+   cd alloy-challenge && cd client
+   ```
+
+2. Install dependencies
+
+   ```
+   npm install
+   ```
+
+3. Run the application
+
+   ```
+   npm run dev
+   ```
+
+   The UI will be available at `http://localhost:5173`.
+
+---
+
+### Screenshots
+
+Here are some screenshots of the application:
+
+![workflow builder](./screenshots/workflow.png)
+
+---
+
+![new-workflow](./screenshots/new-workflow.png)
+
+---
+
+![workflows](./screenshots/workflows.png)
+
+---
+
+![signin](./screenshots/signin.png)
+
+---
+
+![signup](./screenshots/signup.png)
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/YourFeature`
+3. Commit your changes: `git commit -m "feat: describe your feature"`
+4. Push to the branch: `git push origin feature/YourFeature`
+5. Open a Pull Request
+
+Please follow conventional commits and write descriptive commit messages.
+
+---
+
+## Testing
+
+Because of this project is a bonus challenge, I didn't implement any tests for it. But it would be great to have some tests, so I'm open to any contribution to improve the test coverage.

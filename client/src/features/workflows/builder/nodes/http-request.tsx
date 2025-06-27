@@ -37,7 +37,6 @@ export default memo(({ data, isConnectable }: HTTPRequestNodeProps) => {
       <Handle
         type="target"
         position={Position.Left}
-        onConnect={(params) => console.log("handle onConnect", params)}
         isConnectable={isConnectable}
       />
       <Handle

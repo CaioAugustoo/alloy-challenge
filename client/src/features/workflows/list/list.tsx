@@ -86,6 +86,7 @@ export function WorkflowsList({
             title: data.title,
             description: data.description,
             created_at: new Date().toString(),
+            actions: [],
           };
           setWorkflows((prev) => [newWorkflow, ...prev]);
         }}
