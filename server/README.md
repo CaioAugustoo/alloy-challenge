@@ -449,6 +449,8 @@ Some tradeoffs I faced:
 
 - Database: I used Postgres as the database, but I could have used a different database like MongoDB or MySQL. The choice of database right here is personal preference, because I work with Postgres a lot.
 
+- ORM: I didn't use an ORM like TypeORM or Prisma, but I could have. ORMs like TypeORM and Prisma can make it easier to work with databases, but they can also add complexity and overhead to the project. I used plain SQL queries in this project to keep things simple and straightforward.
+
 ---
 
 ## Possible next steps
