@@ -21,7 +21,7 @@ export class UsersRepository implements UsersRepositoryInterface {
 
   async findByEmail(email: string): Promise<User | undefined> {
     const foundUser = await this.db.query<User | undefined>(
-      "SELECT id, name, email, created_at, updated_at FROM users WHERE email = $1",
+      "SELECT id, name, password, email, created_at, updated_at FROM users WHERE email = $1",
       [email]
     );
 

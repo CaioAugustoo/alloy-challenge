@@ -22,7 +22,10 @@ export class SignInUseCase {
       throw new InvalidCredentialsError();
     }
 
-    const isPasswordValid = foundUser.validatePassword(password, this.hasher);
+    const isPasswordValid = await foundUser.validatePassword(
+      password,
+      this.hasher
+    );
     if (!isPasswordValid) {
       throw new InvalidCredentialsError();
     }
