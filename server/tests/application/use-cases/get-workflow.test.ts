@@ -6,6 +6,8 @@ import { NotAllowedToGetWorkflowError } from "../../../src/domain/errors/not-all
 
 const mockWorkflow = {
   id: "wf-1",
+  title: "title",
+  description: "description",
   triggerType: "webhook",
   createdAt: new Date("2023-01-01"),
   updatedAt: new Date("2023-01-02"),
@@ -70,6 +72,8 @@ describe("GetWorkflowUseCase", () => {
 
     expect(result.workflow).toEqual({
       id: "wf-1",
+      title: "title",
+      description: "description",
       triggerType: "webhook",
       createdAt: new Date("2023-01-01"),
       updatedAt: new Date("2023-01-02"),

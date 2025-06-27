@@ -1,4 +1,4 @@
-import type { ActionNode, TriggerType, Workflow } from "../entities/workflow";
+import type { ActionNode, TriggerType } from "../entities/workflow";
 
 export interface GetWorkflowUseCase {
   execute(
@@ -15,6 +15,8 @@ export namespace GetWorkflowUseCase {
   export type Response = {
     workflow: {
       id: string;
+      title: string;
+      description: string;
       triggerType: TriggerType;
       actions: Record<string, ActionNode>;
       createdAt: Date;

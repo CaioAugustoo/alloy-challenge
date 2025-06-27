@@ -33,6 +33,8 @@ export class GetWorkflowUseCase implements GetWorkflowUseCaseInterface {
     return {
       workflow: {
         id: workflow.id,
+        title: workflow.title,
+        description: workflow.description,
         triggerType: workflow.triggerType,
         createdAt: workflow.createdAt,
         updatedAt: workflow.updatedAt,
