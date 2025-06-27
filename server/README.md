@@ -220,7 +220,7 @@ The response will contain the access token.
 
 ---
 
-### POST sigin
+### POST /sigin
 
 Sign in to the API.
 
@@ -441,6 +441,8 @@ The response will contain an array of workflows.
 
 Delete a workflow.
 
+**PS:** The access token must be provided in the request header.
+
 **Curl Example**
 
 ```bash
@@ -456,6 +458,8 @@ The response will return 204 HTTP Status Code if the workflow was deleted succes
 ### PUT /workflows/:workflowId
 
 Update a workflow.
+
+**PS:** The access token must be provided in the request header.
 
 **Curl Example**
 
