@@ -23,9 +23,11 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
+        working-directory: server
         run: npm ci
 
       - name: Run tests
+        working-directory: server
         run: npm run test
 
       - name: Upload coverage to Actions
@@ -33,4 +35,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vitest-coverage
-          path: vitest-coverage
+          path: server/vitest-coverage
