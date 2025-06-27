@@ -1,6 +1,6 @@
 import { Handle, Position, type Node } from "@xyflow/react";
 import { memo } from "react";
-import { TimeIcon } from "./icons/time";
+import { TimeIcon } from "../icons/time";
 
 type DelayNodeData = {
   label: string;

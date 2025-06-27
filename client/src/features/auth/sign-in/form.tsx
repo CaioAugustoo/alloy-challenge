@@ -79,6 +79,7 @@ export function SignInForm({
                   type="password"
                   required
                   value={password}
+                  placeholder="********"
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>

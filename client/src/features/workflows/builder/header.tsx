@@ -27,8 +27,14 @@ export function Header({ workflow }: HeaderProps) {
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h1 className="text-lg text-gray-900">{workflow.title}</h1>
-              <div className="rounded-full bg-gray-800 w-1 h-1" />
-              <p className="text-sm text-gray-500">{workflow.description}</p>
+              {!!workflow.description && (
+                <>
+                  <div className="rounded-full bg-gray-800 w-1 h-1" />
+                  <p className="text-sm text-gray-500">
+                    {workflow.description}
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -45,6 +51,7 @@ export function Header({ workflow }: HeaderProps) {
               Workflow
             </TabsTrigger>
             <TabsTrigger
+              disabled
               onClick={() => navigate("/workflow/logs")}
               value="logs"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-b-primary data-[state=active]:rounded-none px-4 py-2 font-medium"

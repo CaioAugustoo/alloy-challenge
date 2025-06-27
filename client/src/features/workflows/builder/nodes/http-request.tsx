@@ -1,6 +1,6 @@
 import { Handle, Position, type Node } from "@xyflow/react";
 import { memo } from "react";
-import { GlobeIcon } from "./icons/globe";
+import { GlobeIcon } from "../icons/globe";
 
 type HTTPRequestNodeData = {
   label: string;

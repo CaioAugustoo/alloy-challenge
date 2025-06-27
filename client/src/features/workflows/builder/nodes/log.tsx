@@ -1,6 +1,6 @@
 import { Handle, Position, type Node } from "@xyflow/react";
 import { memo } from "react";
-import { LogIcon } from "./icons/log";
+import { LogIcon } from "../icons/log";
 
 type LogNodeData = {
   label: string;

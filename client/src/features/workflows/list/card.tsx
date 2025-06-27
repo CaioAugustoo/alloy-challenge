@@ -15,7 +15,7 @@ export type Workflow = {
   title: string;
   description: string;
   created_at: string;
-  actions: Record<string, any>;
+  actions: any[];
 };
 
 type WorkflowCardProps = Workflow & {

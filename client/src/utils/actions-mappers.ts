@@ -1,14 +1,13 @@
-type RawActions = Record<
-  string,
-  {
-    action_id: string;
-    type: string;
-    params: any;
-    next_ids?: string[];
-  }
->;
+import type { Edge } from "@xyflow/react";
 
-type RFNode = {
+export type ActionItem = {
+  action_id: string;
+  type: string;
+  params: any;
+  next_ids?: string[];
+};
+
+export type CustomNode = {
   id: string;
   type: string;
   position: { x: number; y: number };
@@ -18,24 +17,30 @@ type RFNode = {
   };
 };
 
-type RFEdge = {
+export type CustomEdge = {
   id: string;
   source: string;
   target: string;
   animated?: boolean;
 };
 
-function topoSort(actions: RawActions): string[] {
+function topoSortArray(actionsArr: ActionItem[]): string[] {
+  const actionsMap: Record<string, ActionItem> = {};
+  actionsArr.forEach((a) => {
+    actionsMap[a.action_id] = a;
+  });
+
   const inDegree: Record<string, number> = {};
-  Object.keys(actions).forEach((id) => (inDegree[id] = 0));
-
-  for (const act of Object.values(actions)) {
-    (act.next_ids || []).forEach((nxt) => {
-      inDegree[nxt] = (inDegree[nxt] ?? 0) + 1;
+  actionsArr.forEach((a) => {
+    inDegree[a.action_id] = 0;
+  });
+  actionsArr.forEach((a) => {
+    (a.next_ids || []).forEach((nxt) => {
+      inDegree[nxt] = (inDegree[nxt] || 0) + 1;
     });
-  }
+  });
 
-  const queue: string[] = Object.entries(inDegree)
+  const queue = Object.entries(inDegree)
     .filter(([, deg]) => deg === 0)
     .map(([id]) => id);
 
@@ -43,49 +48,43 @@ function topoSort(actions: RawActions): string[] {
   while (queue.length) {
     const id = queue.shift()!;
     sorted.push(id);
-    for (const nxt of actions[id].next_ids || []) {
+    for (const nxt of actionsMap[id].next_ids || []) {
       inDegree[nxt]!--;
       if (inDegree[nxt] === 0) queue.push(nxt);
     }
   }
 
-  if (sorted.length !== Object.keys(actions).length) {
-    console.warn("topoSort: dependency cycle detected");
+  if (sorted.length !== actionsArr.length) {
+    console.warn("topoSortArray: dependency cycle detected");
   }
-
   return sorted;
 }
 
-export function mapActionsToFlow(actions: RawActions): {
-  nodes: RFNode[];
-  edges: RFEdge[];
+export function mapActionsToFlow(actionsArr: ActionItem[]): {
+  nodes: CustomNode[];
+  edges: Edge[];
 } {
   const spacingX = 400;
-  const sortedIds = topoSort(actions);
 
-  const nodes: RFNode[] = sortedIds.map((id, idx) => {
-    const act = actions[id];
-    const typeMap: Record<string, string> = {
-      log: "logNode",
-      delay: "delayNode",
-      http: "httpRequestNode",
-    };
+  const sortedIds = topoSortArray(actionsArr);
 
+  const typeMap: Record<string, string> = {
+    log: "logNode",
+    delay: "delayNode",
+    http: "httpRequestNode",
+  };
+
+  const nodes: CustomNode[] = sortedIds.map((id, idx) => {
+    const act = actionsArr.find((a) => a.action_id === id)!;
     return {
-      id: act.action_id,
+      id,
       type: typeMap[act.type] || "default",
-      position: {
-        x: idx * spacingX,
-        y: 0,
-      },
-      data: {
-        label: act.type.toUpperCase(),
-        params: act.params,
-      },
+      position: { x: idx * spacingX, y: 0 },
+      data: { label: act.type.toUpperCase(), params: act.params },
     };
   });
 
-  const edges: RFEdge[] = Object.values(actions).flatMap((act) =>
+  const edges: Edge[] = actionsArr.flatMap((act) =>
     (act.next_ids || []).map((nxt) => ({
       id: `${act.action_id}-${nxt}`,
       source: act.action_id,
@@ -97,45 +96,37 @@ export function mapActionsToFlow(actions: RawActions): {
   return { nodes, edges };
 }
 
-export type ActionItem = {
-  action_id: string;
-  type: string;
-  params: any;
-  next_ids?: string[];
-};
-
 export function mapFlowToActions(
-  nodes: RFNode[],
-  edges: RFEdge[]
+  nodes: CustomNode[],
+  edges: Edge[]
 ): ActionItem[] {
   const actionsMap: Record<string, ActionItem> = {};
+  const typeMap: Record<string, string> = {
+    logNode: "log",
+    delayNode: "delay",
+    httpRequestNode: "http",
+  };
 
-  for (const node of nodes) {
-    const typeMap: Record<string, string> = {
-      logNode: "log",
-      delayNode: "delay",
-      httpRequestNode: "http",
-    };
-
+  nodes.forEach((node) => {
     actionsMap[node.id] = {
       action_id: node.id,
       type: typeMap[node.type] || "unknown",
       params: node.data.params,
       next_ids: [],
     };
-  }
+  });
 
-  for (const { source, target } of edges) {
+  edges.forEach(({ source, target }) => {
     if (actionsMap[source]) {
       actionsMap[source].next_ids!.push(target);
     }
-  }
+  });
 
-  for (const key in actionsMap) {
-    if (actionsMap[key].next_ids!.length === 0) {
-      delete actionsMap[key].next_ids;
+  Object.values(actionsMap).forEach((a) => {
+    if (a.next_ids && a.next_ids.length === 0) {
+      delete a.next_ids;
     }
-  }
+  });
 
   return Object.values(actionsMap);
 }

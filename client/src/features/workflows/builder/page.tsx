@@ -19,6 +19,8 @@ export function WorkflowPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     async function fetchWorkflow() {
       try {
@@ -54,6 +56,7 @@ export function WorkflowPage() {
 
   const saveWorkflow = async (actions: ActionItem[]) => {
     try {
+      setIsSaving(true);
       await workflowsService.updateWorkflow({
         workflowId: workflow.id,
         title: workflow.title,
@@ -63,6 +66,8 @@ export function WorkflowPage() {
       });
     } catch (error) {
       toast.error(getErrorMessage(error));
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -71,7 +76,7 @@ export function WorkflowPage() {
       <Header workflow={workflow} />
 
       <div className="w-screen h-screen">
-        <Builder data={workflow} onSave={saveWorkflow} />
+        <Builder data={workflow} onSave={saveWorkflow} isSaving={isSaving} />
       </div>
     </div>
   );
